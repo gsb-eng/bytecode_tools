@@ -32,8 +32,3 @@ class Unpack:
         """
         pass
 
-
-def load_file():
-	"""
-	"""
-    pass
