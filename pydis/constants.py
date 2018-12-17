@@ -124,7 +124,7 @@ MARSHAL_CODES = {
     0x46: 'false',
     0x54: 'true',
     0x53: 'stopiter',
-    0x2e: 'elipsis',
+    0x2e: 'ellipsis',
     0x69: 'int',
     0x49: 'int64',
     0x66: 'float',
