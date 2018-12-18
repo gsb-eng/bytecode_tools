@@ -18,7 +18,7 @@ class _NULL:
 class _Unmarshal:
 
     def __init__(self, fp, python_version):
-        self.fp. =fp
+        self._read = fp
         self.python_version = python_version
 
     def _load_code_handler(self, code):
@@ -53,6 +53,27 @@ class _Unmarshal:
     def load_ellipsis(self):
         return Ellipsis
 
+    def r_short(self):
+        x = ord(self._read(1)) | (ord(self._read(1)) << 8)
+        if x & 0x8000:
+            x = x - 0x10000
+        return x
+
+    def r_long(self):
+        s = self._read(4)
+        a = ord(s[0])
+        b = ord(s[1])
+        c = ord(s[2])
+        d = ord(s[3])
+        x = a | (b<<8) | (c<<16) | (d<<24)
+        if d & 0x80 and x > 0:
+            x = -((1 << 32) - x)
+            return int(x)
+        else:
+            return x
+
+    # TODO: handle this with Python2
+    # Not required in python3
     def load_int(self):
         pass
 
@@ -66,7 +87,16 @@ class _Unmarshal:
         pass
 
     def load_long(self):
-        pass
+        size = self.r_long()
+        sign = 1
+        if size < 0:
+            sign = -1
+            size = -size
+        x = 0
+        for i in range(size):
+            d = self.r_short()
+            x = x | (d<<(i*15))
+        return x * sign
 
     def load_string(self):
         pass
