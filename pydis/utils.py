@@ -27,8 +27,13 @@ P   void *              integer                         (5), (3)
 
 #  h, i, q, B, d
 class Unpack:
-    def unpack_unsigned_char(fp):
+    def unsigned_char(fp):
         """Unpacking unsigned char 
         """
         pass
 
+
+def load_file():
+	"""
+	"""
+    pass

@@ -5,12 +5,14 @@
 import struct
 
 from pydis import compatibility as compat 
-from pydis.constants import FLAG_REF as REF, MARSHAL_CODES
-from pydis.constants import IS_PY2, IS_PY3, MAGIC_NUMBERS, PY_VERSION
-
+from pydis.constants import (
+    FLAG_REF as REF, IS_PY2, IS_PY3, MAGIC_NUMBERS, MARSHAL_CODES, PY_VERSION
+)
 
 # TODO: Add more version compatibilities.
 # Python2 intrepreter should be supported.
+class _NULL:
+    pass
 
 
 class _Unmarshal:
@@ -19,9 +21,22 @@ class _Unmarshal:
         self.fp. =fp
         self.python_version = python_version
 
+    def _load_code_handler(self, code):
+        """Loading and executing marshal code specific handler.
+
+        Marshal codes are defined in constants.MARSHAL_CODES, each code is
+        binded with a specific encoding for serialization purpose.
+
+        Arguments:
+            code: Single byte in the byte stream.
+
+        Returns:
+            The specifix handlers return type.
+        """
+        return getattr(self, 'load_{}'.format(code))()
 
     def load_null(self):
-        return None
+        return _NULL
 
     def load_none(self):
         return None
