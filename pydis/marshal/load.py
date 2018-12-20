@@ -125,10 +125,11 @@ class _Unmarshal:
         return ret_val
 
     def load_float(self):
-        pass
+        size = self._read(1)
+        return float(self._read(int(size)))
 
     def load_binary_float(self):
-        pass
+        return struct.unpack('<d', self._read(8))[0]
 
     def load_long(self):
         # It lands here if the numeric value is >= 64 bit
@@ -195,7 +196,16 @@ class _Unmarshal:
         return x * sign
 
     def load_string(self):
-        pass
+        size = self.load_long()
+        val = self._read(size)
+
+        if IS_PY3:
+            return compat.BytesType(val)
+        else:
+            # Handle Python2 case, the current interpreter is of python3 and
+            # handling Python2 generated PYC file. then convert bytes to native
+            # str
+            pass
 
     def load_interned(self):
         pass
