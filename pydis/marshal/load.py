@@ -90,9 +90,19 @@ class _Unmarshal:
             pass
 
     def load_int64(self):
-        # Straight load of 64 bit, it's a C long long type.
+        # PYTHON'S LONG VALUE BYTE ARRAY IS AS BELOW.....as per longobject.h
         #
-        # In pyc context, it will be 8 bytes.
+        # _PyLong_AsByteArray: Convert the least-significant 8*n bits of long
+        # v to a base-256 integer, stored in array bytes.  Normally return 0,
+        # return -1 on error.
+        # If little_endian is 1/true, store the MSB at bytes[n-1] and the LSB at
+        # bytes[0]; else (little_endian is 0/false) store the MSB at bytes[0] and
+        # the LSB at bytes[n-1].
+        # If is_signed is 0/false, it's an error if v < 0; else (v >= 0) n bytes
+        # are filled and there's nothing special about bit 0x80 of the MSB.
+        # If is_signed is 1/true, bytes is filled with the 2's-complement
+        # representation of v's value.  Bit 0x80 of the MSB is the sign bit.
+
         b0 = self._read(1)
         b1 = self._read(1)
         b2 = self._read(1)
@@ -101,12 +111,17 @@ class _Unmarshal:
         b5 = self._read(1)
         b6 = self._read(1)
         b7 = self._read(1)
+
+        # Return this if the value is not signed.
         ret_val = (
             b0 | b1 << 8 | b2 << 16 | b3 << 24 |
             b4 << 32 | b5 << 40 | b6 << 48 | b7 << 56
         )
-        if b7 & 0x80 and ret_val > 0:
+
+        # Handle signed case.
+        if b7 & 0x80:
             ret_val = -((1 << 64) - ret_val)
+
         return ret_val
 
     def load_float(self):
