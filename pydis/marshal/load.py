@@ -122,7 +122,7 @@ class _Unmarshal:
         # Statement from marshal.c
         #
         # We assume that Python ints are stored internally in base some power of
-        # 2**15; for the sake of portability we'll always read and write them 
+        # 2**15; for the sake of portability we'll always read and write them
         # in base exactly 2**15.
         #
         # Certainly this is because, the INT in python is signed and it ranges
@@ -131,7 +131,7 @@ class _Unmarshal:
         #
         # I.e: n = 14273427342342384723428347234
         #
-        # d = (n & (2**15 - 1)) -> 3426 
+        # d = (n & (2**15 - 1)) -> 3426
         #   n >>= 15 --> 435590434031444846296031
         # d = (n & (2**15 - 1)) -> 15327
         #   n >>= 15 --> 13293165101057276803
