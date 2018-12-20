@@ -83,7 +83,11 @@ class _Unmarshal:
     # TODO: handle this with Python2
     # Not required in python3
     def load_int(self):
-        pass
+        if IS_PY3:
+            self.load_long()
+        else:
+            # TODO: Handle this when it reaches, PY2 interpreters.
+            pass
 
     def load_int64(self):
         # Straight load of 64 bit, it's a C long long type.
