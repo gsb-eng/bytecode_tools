@@ -17,7 +17,11 @@ class _NULL:
 
 class _Unmarshal:
 
-    def __init__(self, fp, python_version=None):
+    def __init__(self):
+        self._reflist = []  # Reserve interned objects.
+        self._string_reflist = []  # Reserve for loading strings.
+
+    def __call__(self, fp, python_version=None):
         # File pointer opned in binary mode.
         # One should make sure, if the pyc file is passed the first 8/12 bytes
         # should be read before reaching here. otherwise a bad marshal exception
@@ -28,6 +32,26 @@ class _Unmarshal:
         self.py_version = (
             python_version if python_version else PY_VERSION
         )
+
+        self._load()
+
+    def _load(self):
+        """Load the encodes bytes with marshal.
+        """
+        c = ord('?')
+        try:
+            c = self._read(1)
+            if c & REF:
+                idx = self._reserve_rerlist()
+                result = self._load_code_handler(c & ~REF)()
+                self._reflist[idx] = result
+            else:
+                result = self._load_code_handler(c)()
+                return result
+        except KeyError:
+            raise ValueError('bad marshal code: %r (%02x)' % (chr(c), c))
+        except IndexError:
+            raise EOFError
 
     def _load_code_handler(self, code):
         """Loading and executing marshal code specific handler.
@@ -41,7 +65,16 @@ class _Unmarshal:
         Returns:
             The specifix handlers return type.
         """
-        return getattr(self, 'load_{}'.format(code))()
+        return getattr(self, 'load_{}'.format(code))
+
+    def _reserver_reflist(self):
+        index = len(self._reflist)
+        self._reflist.append(None)
+        return index
+
+    def _mark_ref(self, val):
+        self._reflist.append(val)
+        return val
 
     def load_null(self):
         return _NULL
@@ -208,49 +241,68 @@ class _Unmarshal:
             pass
 
     def load_interned(self):
-        pass
+        # Interned objects are stored as 4*octa --> 32 bits.
+        size = self.read_long()
+        val = self._read(size)
+        self._string_reflist.append(val)
+        return self._mark_ref(val)
 
-    def stringref(self):
-        pass
-
-    def load_tuple(self):
-        pass
+    def load_stringref(self):
+        index = self.read_long()
+        return self._string_reflist[index]
 
     def load_list(self):
-        pass
+        size = self.read_long()
+        ret_val = [self._load() for i in range(size)]
+        return ret_val
+
+    def load_tuple(self):
+        return tuple(self.load_list())
+
+    def load_set(self):
+        return set(self.load_list())
+
+    def load_frozenset(self):
+        return frozenset(self.load_list())
 
     def load_dict(self):
-        pass
+        temp_dict = {}
+
+        while 1:
+            key = self._load()
+            if key == None:
+                break
+            value = self._load()
+            temp_dict[key] = value
+        return temp_dict
 
     def load_code(self):
         pass
 
     def load_unicode(self):
-        pass
+        size = self.read_long()
+        unicode_bytes = self._read(size)
 
-    def load_unknown(self):
-        pass
-
-    def load_set(self):
-        pass
-
-    def load_frozenset(self):
-        pass
+        # TODO: Handle version incompatibilities with unicode.
+        return unicode_bytes.decode('utf-8')
 
     def load_ref(self):
-        pass
+        index = self.read_long()
+        return self._reflist[index]
 
     def load_ascii(self):
-        pass
+        size = self.read_long()
+        return compat.native_str(self._read(size))
 
     def load_ascii_interned(self):
-        pass
-
-    def load_tuple(self):
-        pass
+        size = unpack('B', self._read(1))
+        interned_ascii = compat.native_str(size)
+        self._string_reflist.append(interned_ascii)
+        return interned_ascii
 
     def load_short_ascii(self):
-        pass
+        size = unpack('B', self._read(1))
+        return compat.native_str(size)
 
     def load_short_ascii_interned(self):
         pass
