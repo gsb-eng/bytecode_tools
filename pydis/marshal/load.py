@@ -277,7 +277,45 @@ class _Unmarshal:
         return temp_dict
 
     def load_code(self):
-        pass
+        """
+        Here is the order of flags loaded on marshal.c
+
+            argcount 
+            kwonlyargcount
+            nlocals
+            stacksize
+            flags
+            code
+            consts
+            names
+            varnames
+            freevars
+            cellvars
+            filename
+            name
+            firstlineno
+            lnotab
+
+            ORDER MATTERS: They are fixed position bytes.
+        """
+        argcount = self.read_long()
+        kwonlyargcount = self.read_long()
+        nlocals = self.read_long()
+        stacksize = self.read_long()
+        flags = self.read_long()
+        code = self.load()
+        consts = self.load()
+        names = self.load()
+        varnames = self.load()
+        freevars = self.load()
+        cellvars = self.load()
+        filename = self.load()
+        name = self.load()
+        firstlineno = self.read_long()
+
+        lnotab = self.load()
+        # TODO: Return a code object.
+        return
 
     def load_unicode(self):
         size = self.read_long()
