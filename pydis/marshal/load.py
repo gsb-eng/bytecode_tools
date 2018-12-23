@@ -15,6 +15,30 @@ class _NULL:
     pass
 
 
+class Code:
+
+    def __init__(
+        self, argcount, kwonlyargcount, nlocals, stacksize, flags, code,
+        consts, names, varnames, filename, name, firstlineno, lnotab,
+        freevars, cellvars
+    ):
+        self.co_argcount = argcount
+        self.co_kwonlyargcount = kwonlyargcount
+        self.co_nlocals = nlocals
+        self.co_stacksize = stacksize
+        self.co_flags = flags
+        self.co_code = code
+        self.co_consts = consts
+        self.co_names = names
+        self.co_varnames = varnames
+        self.co_filename = filename
+        self.co_name = name
+        self.co_firstlineno = firstlineno
+        self.co_lnotab = lnotab
+        self.co_freevars = freevars
+        self.co_cellvars = cellvars
+
+
 class _Unmarshal:
 
     def __init__(self):
