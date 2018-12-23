@@ -1,6 +1,7 @@
 """Python version compatibility functions."""
 
 import six
+import sys
 
 from pydis.constants import IS_PY3
 

@@ -50,7 +50,8 @@ class _Unmarshal:
         # One should make sure, if the pyc file is passed the first 8/12 bytes
         # should be read before reaching here. otherwise a bad marshal exception
         # occurs.
-        self._read = fp
+        self.fp = fp
+        self._read = fp.read
 
         # If no python_version passed, it's the current intertreter version.
         self.py_version = (
@@ -59,19 +60,35 @@ class _Unmarshal:
 
         self._load()
 
+    def _read_byte(self, keep_pos=False):
+        """Read an unsigned byte.
+
+        Arguments:
+            keep_pos: A boolean value to track the current buffer position.
+        Returns:
+            Single byte value.
+        """
+        pos = self.fp.tell()
+        val = self._read(1)
+        if keep_pos:
+            self.fp.seek(pos)
+        return val
+
     def _load(self):
         """Load the encodes bytes with marshal.
         """
         c = ord('?')
         try:
-            c = self._read(1)
+            c = ord(self._read_byte())
             if c & REF:
-                idx = self._reserve_rerlist()
-                result = self._load_code_handler(c & ~REF)()
+                idx = self._reserve_reflist()
+                result = self._load_code_handler(MARSHAL_CODES[c & ~REF])()
+                print(result)
                 self._reflist[idx] = result
             else:
-                result = self._load_code_handler(c)()
-                return result
+                result = self._load_code_handler(MARSHAL_CODES[c])()
+                print(result)
+            return result
         except KeyError:
             raise ValueError('bad marshal code: %r (%02x)' % (chr(c), c))
         except IndexError:
@@ -91,7 +108,7 @@ class _Unmarshal:
         """
         return getattr(self, 'load_{}'.format(code))
 
-    def _reserver_reflist(self):
+    def _reserve_reflist(self):
         index = len(self._reflist)
         self._reflist.append(None)
         return index
@@ -126,10 +143,10 @@ class _Unmarshal:
 
     def read_long(self):
         s = self._read(4)
-        a = ord(s[0])
-        b = ord(s[1])
-        c = ord(s[2])
-        d = ord(s[3])
+        a = s[0]
+        b = s[1]
+        c = s[2]
+        d = s[3]
         x = a | (b<<8) | (c<<16) | (d<<24)
         if d & 0x80 and x > 0:
             x = -((1 << 32) - x)
@@ -247,13 +264,13 @@ class _Unmarshal:
         digit_size = self.read_long()
         sign = 1 if digit_size < 0 else -1
         x = 0
-        for i in range(abc(digit_size)):
+        for i in range(digit_size):
             d = self.r_short()
             x = x | (d<<(i*15))
         return x * sign
 
     def load_string(self):
-        size = self.load_long()
+        size = self.read_long()
         val = self._read(size)
 
         if IS_PY3:
@@ -277,11 +294,25 @@ class _Unmarshal:
 
     def load_list(self):
         size = self.read_long()
-        ret_val = [self._load() for i in range(size)]
+        try:
+            ret_val = [self._load() for i in range(size)]
+        except KeyError:
+            import pdb;pdb.set_trace()
         return ret_val
 
     def load_tuple(self):
         return tuple(self.load_list())
+
+    def load_small_tuple(self):
+        size = ord(self._read_byte())
+        pos = self.fp.tell()
+        try:
+            ret_val = [self._load() for i in range(size)]
+        except ValueError:
+            import pdb;pdb.set_trace()
+            raise
+
+        return tuple(ret_val)
 
     def load_set(self):
         return set(self.load_list())
@@ -327,17 +358,17 @@ class _Unmarshal:
         nlocals = self.read_long()
         stacksize = self.read_long()
         flags = self.read_long()
-        code = self.load()
-        consts = self.load()
-        names = self.load()
-        varnames = self.load()
-        freevars = self.load()
-        cellvars = self.load()
-        filename = self.load()
-        name = self.load()
+        code = self._load()
+        consts = self._load()
+        names = self._load()
+        varnames = self._load()
+        freevars = self._load()
+        cellvars = self._load()
+        filename = self._load()
+        name = self._load()
         firstlineno = self.read_long()
 
-        lnotab = self.load()
+        lnotab = self._load()
         # TODO: Return a code object.
         return
 
@@ -357,14 +388,17 @@ class _Unmarshal:
         return compat.native_str(self._read(size))
 
     def load_ascii_interned(self):
-        size = unpack('B', self._read(1))
+        size = struct.unpack('B', self._read(1))[0]
         interned_ascii = compat.native_str(size)
         self._string_reflist.append(interned_ascii)
         return interned_ascii
 
     def load_short_ascii(self):
-        size = unpack('B', self._read(1))
-        return compat.native_str(size)
+        size = struct.unpack('B', self._read(1))[0]
+        return compat.native_str(self._read(size))
 
     def load_short_ascii_interned(self):
         pass
+
+
+load = _Unmarshal()

@@ -1,7 +1,7 @@
 # Copyright (c) 2018 by Srinivas Garlapati
 
 
-from pydis.marshal.load import loads
+from pydis.marshal.load import load
 
 
 FLAG_REF = 0x80
@@ -40,4 +40,4 @@ MARSHAL_CODES = {
 }
 
 
-__all__ = [loads]
+__all__ = [load]

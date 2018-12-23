@@ -118,7 +118,7 @@ MAGIC_NUMBERS = {
     3394: (3, 7),  # b5
 }
 
-MARSHAL_CODES = {
+MARSHAL_CODES_HEX = {
     0x30: 'null',
     0x4e: 'none',
     0x46: 'false',
@@ -149,4 +149,37 @@ MARSHAL_CODES = {
     0x29: 'small_tuple',
     0x7a: 'short_ascii',
     0x5a: 'short_ascii_interned'
+}
+
+MARSHAL_CODES = {
+    48: 'null',
+    78: 'none',
+    70: 'false',
+    84: 'true',
+    83: 'stopiter',
+    46: 'ellipsis',
+    105: 'int',
+    73: 'int64',
+    102: 'float',
+    103: 'binary_float',
+    120: 'complex',
+    121: 'binary_complex',
+    108: 'long',
+    115: 'string',
+    116: 'interned',
+    82: 'stringref',
+    40: 'tuple',
+    91: 'list',
+    123: 'dict',
+    99: 'code',
+    117: 'unicode',
+    63: 'unknown',
+    60: 'set',
+    62: 'frozenset',
+    114: 'ref',
+    97: 'ascii',
+    65: 'ascii_interned',
+    41: 'small_tuple',
+    122: 'short_ascii',
+    90: 'short_ascii_interned'
 }
