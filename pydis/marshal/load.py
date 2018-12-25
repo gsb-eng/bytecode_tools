@@ -38,6 +38,11 @@ class Code:
         self.co_freevars = freevars
         self.co_cellvars = cellvars
 
+    def __repr__(self):
+        return ('<code object %s at %0x, file "%s", line %d>' % (
+            self.co_name, id(self), self.co_filename, self.co_firstlineno)
+        )
+
 
 class _Unmarshal:
 
@@ -58,7 +63,7 @@ class _Unmarshal:
             python_version if python_version else PY_VERSION
         )
 
-        self._load()
+        return self._load()
 
     def _read_byte(self, keep_pos=False):
         """Read an unsigned byte.
@@ -83,11 +88,10 @@ class _Unmarshal:
             if c & REF:
                 idx = self._reserve_reflist()
                 result = self._load_code_handler(MARSHAL_CODES[c & ~REF])()
-                print(result)
                 self._reflist[idx] = result
             else:
                 result = self._load_code_handler(MARSHAL_CODES[c])()
-                print(result)
+
             return result
         except KeyError:
             raise ValueError('bad marshal code: %r (%02x)' % (chr(c), c))
@@ -116,6 +120,50 @@ class _Unmarshal:
     def _mark_ref(self, val):
         self._reflist.append(val)
         return val
+
+    def load_code(self):
+        """
+        Here is the order of flags loaded on marshal.c
+
+            argcount
+            kwonlyargcount
+            nlocals
+            stacksize
+            flags
+            code
+            consts
+            names
+            varnames
+            freevars
+            cellvars
+            filename
+            name
+            firstlineno
+            lnotab
+
+            ORDER MATTERS: They are fixed position bytes.
+        """
+
+        argcount = self.read_long()
+        kwonlyargcount = self.read_long()
+        nlocals = self.read_long()
+        stacksize = self.read_long()
+        flags = self.read_long()
+        code = self._load()
+        consts = self._load()
+        names = self._load()
+        varnames = self._load()
+        freevars = self._load()
+        cellvars = self._load()
+        filename = self._load()
+        name = self._load()
+        firstlineno = self.read_long()
+        lnotab = self._load()
+        return Code(
+            argcount, kwonlyargcount, nlocals, stacksize, flags,
+            code, consts, names, varnames, filename, name, firstlineno,
+            lnotab, freevars, cellvars
+        )
 
     def load_null(self):
         return _NULL
@@ -191,7 +239,6 @@ class _Unmarshal:
             b0 | b1 << 8 | b2 << 16 | b3 << 24 |
             b4 << 32 | b5 << 40 | b6 << 48 | b7 << 56
         )
-
         # Handle signed case.
         if b7 & 0x80:
             ret_val = -((1 << 64) - ret_val)
@@ -260,9 +307,8 @@ class _Unmarshal:
         #
         # Negative values are as simple as positive, just the sign gets stored
         # along with number of digits.
-
         digit_size = self.read_long()
-        sign = 1 if digit_size < 0 else -1
+        sign = -1 if digit_size < 0 else 1
         x = 0
         for i in range(digit_size):
             d = self.r_short()
@@ -294,10 +340,7 @@ class _Unmarshal:
 
     def load_list(self):
         size = self.read_long()
-        try:
-            ret_val = [self._load() for i in range(size)]
-        except KeyError:
-            import pdb;pdb.set_trace()
+        ret_val = [self._load() for i in range(size)]
         return ret_val
 
     def load_tuple(self):
@@ -306,12 +349,7 @@ class _Unmarshal:
     def load_small_tuple(self):
         size = ord(self._read_byte())
         pos = self.fp.tell()
-        try:
-            ret_val = [self._load() for i in range(size)]
-        except ValueError:
-            import pdb;pdb.set_trace()
-            raise
-
+        ret_val = [self._load() for i in range(size)]
         return tuple(ret_val)
 
     def load_set(self):
@@ -331,47 +369,6 @@ class _Unmarshal:
             temp_dict[key] = value
         return temp_dict
 
-    def load_code(self):
-        """
-        Here is the order of flags loaded on marshal.c
-
-            argcount 
-            kwonlyargcount
-            nlocals
-            stacksize
-            flags
-            code
-            consts
-            names
-            varnames
-            freevars
-            cellvars
-            filename
-            name
-            firstlineno
-            lnotab
-
-            ORDER MATTERS: They are fixed position bytes.
-        """
-        argcount = self.read_long()
-        kwonlyargcount = self.read_long()
-        nlocals = self.read_long()
-        stacksize = self.read_long()
-        flags = self.read_long()
-        code = self._load()
-        consts = self._load()
-        names = self._load()
-        varnames = self._load()
-        freevars = self._load()
-        cellvars = self._load()
-        filename = self._load()
-        name = self._load()
-        firstlineno = self.read_long()
-
-        lnotab = self._load()
-        # TODO: Return a code object.
-        return
-
     def load_unicode(self):
         size = self.read_long()
         unicode_bytes = self._read(size)
@@ -388,17 +385,20 @@ class _Unmarshal:
         return compat.native_str(self._read(size))
 
     def load_ascii_interned(self):
-        size = struct.unpack('B', self._read(1))[0]
-        interned_ascii = compat.native_str(size)
+        size = self._read_byte()
+        interned_ascii = compat.native_str(self._read(size))
         self._string_reflist.append(interned_ascii)
         return interned_ascii
 
     def load_short_ascii(self):
-        size = struct.unpack('B', self._read(1))[0]
+        size = ord(self._read_byte())
         return compat.native_str(self._read(size))
 
     def load_short_ascii_interned(self):
-        pass
+        size = ord(self._read_byte())
+        interned = compat.native_str(self._read(size))
+        self._string_reflist.append(interned)
+        return interned
 
 
 load = _Unmarshal()

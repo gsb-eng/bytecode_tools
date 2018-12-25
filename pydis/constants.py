@@ -152,7 +152,7 @@ MARSHAL_CODES_HEX = {
 }
 
 MARSHAL_CODES = {
-    48: 'null',
+    48: 'none',
     78: 'none',
     70: 'false',
     84: 'true',
