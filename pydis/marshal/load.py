@@ -143,7 +143,6 @@ class _Unmarshal:
 
             ORDER MATTERS: They are fixed position bytes.
         """
-
         argcount = self.read_long()
         kwonlyargcount = self.read_long()
         nlocals = self.read_long()
@@ -206,7 +205,7 @@ class _Unmarshal:
     # Not required in python3
     def load_int(self):
         if IS_PY3:
-            self.load_long()
+            return self.read_long()
         else:
             # TODO: Handle this when it reaches, PY2 interpreters.
             pass
@@ -348,7 +347,6 @@ class _Unmarshal:
 
     def load_small_tuple(self):
         size = ord(self._read_byte())
-        pos = self.fp.tell()
         ret_val = [self._load() for i in range(size)]
         return tuple(ret_val)
 
