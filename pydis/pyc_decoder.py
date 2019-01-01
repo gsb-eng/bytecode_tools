@@ -20,11 +20,10 @@ def decode_magic_to_version(magic):
     """
     return MAGIC_NUMBERS[struct.unpack('<H', magic)]
 
+
 def decode_header(header_bytes):
     """Returns the decoded header part of pyc file.
 
-    pyc file structure varied from 2.x to 3.x
+    pyc file structure varied from 2.x to 3.x or even between 3.x versions.
     """
-
-
-def decode_pyc()
+    pass
