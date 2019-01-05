@@ -1,6 +1,8 @@
 # Copyright (c) 2018 by Srinivas Garlapati
 
 """Marshal utility.
+
+This implementation is motivated from pypy/lib_pypy/_marshal.py.
 """
 import struct
 
@@ -58,7 +60,7 @@ class _Unmarshal:
         self.fp = fp
         self._read = fp.read
 
-        # If no python_version passed, it's the current intertreter version.
+        # If no python_version passed, it's the current interpreter version.
         self.py_version = (
             python_version if python_version else PY_VERSION
         )
@@ -91,12 +93,9 @@ class _Unmarshal:
                 self._reflist[idx] = result
             else:
                 result = self._load_code_handler(MARSHAL_CODES[c])()
-
             return result
         except KeyError:
             raise ValueError('bad marshal code: %r (%02x)' % (chr(c), c))
-        except IndexError:
-            raise EOFError
 
     def _load_code_handler(self, code):
         """Loading and executing marshal code specific handler.
@@ -143,6 +142,7 @@ class _Unmarshal:
 
             ORDER MATTERS: They are fixed position bytes.
         """
+
         argcount = self.read_long()
         kwonlyargcount = self.read_long()
         nlocals = self.read_long()

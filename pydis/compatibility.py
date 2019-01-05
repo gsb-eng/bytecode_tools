@@ -1,3 +1,5 @@
+# Copyright (c) 2018 by Srinivas Garlapati
+
 """Python version compatibility functions."""
 
 import six
