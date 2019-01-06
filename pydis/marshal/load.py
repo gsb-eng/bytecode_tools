@@ -5,6 +5,7 @@
 This implementation is motivated from pypy/lib_pypy/_marshal.py.
 """
 import struct
+import types
 
 from pydis import compatibility as compat 
 from pydis.constants import (
@@ -15,35 +16,6 @@ from pydis.constants import (
 # Python2 intrepreter should be supported.
 class _NULL:
     pass
-
-
-class Code:
-
-    def __init__(
-        self, argcount, kwonlyargcount, nlocals, stacksize, flags, code,
-        consts, names, varnames, filename, name, firstlineno, lnotab,
-        freevars, cellvars
-    ):
-        self.co_argcount = argcount
-        self.co_kwonlyargcount = kwonlyargcount
-        self.co_nlocals = nlocals
-        self.co_stacksize = stacksize
-        self.co_flags = flags
-        self.co_code = code
-        self.co_consts = consts
-        self.co_names = names
-        self.co_varnames = varnames
-        self.co_filename = filename
-        self.co_name = name
-        self.co_firstlineno = firstlineno
-        self.co_lnotab = lnotab
-        self.co_freevars = freevars
-        self.co_cellvars = cellvars
-
-    def __repr__(self):
-        return ('<code object %s at %0x, file "%s", line %d>' % (
-            self.co_name, id(self), self.co_filename, self.co_firstlineno)
-        )
 
 
 class _Unmarshal:
@@ -158,7 +130,8 @@ class _Unmarshal:
         name = self._load()
         firstlineno = self.read_long()
         lnotab = self._load()
-        return Code(
+
+        return types.CodeType(
             argcount, kwonlyargcount, nlocals, stacksize, flags,
             code, consts, names, varnames, filename, name, firstlineno,
             lnotab, freevars, cellvars
