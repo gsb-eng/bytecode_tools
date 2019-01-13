@@ -85,7 +85,7 @@ def _decode_header(fp):
     magic = _decode_magic(fp)
     ts = _decode_timestamp_bytes(fp, magic)
     size = _decode_size_bytes(fp)
-    return magic, ts, size
+    return magic, ts, _decode_size_bytes
 
 
 def decode_pyc(file_or_bytes):
@@ -109,6 +109,8 @@ def decode_pyc(file_or_bytes):
         fp = io.BytesIO(file_or_bytes)
     elif isinstance(file_or_bytes, io.BytesIO):
         fp = file_or_bytes
+    else:
+        raise ValueError('No resource found with %s' % file_or_bytes)
 
     magic, ts, size = _decode_header(fp)
     code_object = load(fp)
