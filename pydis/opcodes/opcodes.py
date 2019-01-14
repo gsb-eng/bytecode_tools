@@ -1,0 +1,17 @@
+from .constants import (
+    CMP_OP, EXTENDED_ARG, HAVE_ARGUMENT, OPCODES, OPCODES_3_5, OPCODES_3_6,
+    OPCODES_3_7,
+
+    # Opcode flags
+    HAS_COM, HAS_CONST, HAS_FREE, HAS_JREL, HAS_JABS, HAS_LOCAL,
+    HAS_NAME, HAS_NARGS,
+
+    # Opcodes classifications
+    CMP_OPCODES, CONST_OPCODES, FREE_OPCODES, JREL_OPCODES,
+    JABS_OPCODES, LOCAL_OPCODES, NAME_OPCODES, NARGS_OPCODES,
+)
+
+
+class OpcodeFactory:
+
+    pass
