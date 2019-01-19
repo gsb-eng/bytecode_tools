@@ -135,6 +135,8 @@ OPCODES = {
     161: 'CALL_METHOD'
 }
 
+OPCODES_3_0 = OPCODES
+
 OPCODES_3_5 = OPCODES.copy()
 
 # overrrided opcdes in 3.5
@@ -166,7 +168,7 @@ OPCODES_3_7.update({
     161: 'CALL_METHOD'
 })
 
-HAVE_ARGUMENT = 90  # Opcode > 90 have arguments to deal with
+HAS_ARGUMENT = 90  # Opcode > 90 have arguments to deal with
 EXTENDED_ARG = 144  # Extended argument opcode number.
 
 # Opcodes with name table lookup required.
