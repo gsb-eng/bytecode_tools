@@ -193,3 +193,5 @@ LOCAL_OPCODES = (124, 125, 126)
 
 # Opcodes with free variables involved, like closure.
 FREE_OPCODES = (135, 136, 137, 138, 148)
+
+NARGS_OPCODES = (None, )
