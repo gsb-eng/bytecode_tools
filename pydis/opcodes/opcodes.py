@@ -61,6 +61,10 @@ class Opcode:
     def has_arg(cls):
         return cls.OP_CODE >= HAS_ARGUMENT
 
+    @classmethod
+    def is_extended_arg(self):
+        return cls.OP_CODE == EXTENDED_ARG
+
 
 class OpcodeClassFactory:
 
@@ -69,6 +73,7 @@ class OpcodeClassFactory:
 
         # If no version passed, then consider default python 3 opcodes.
         ops = globals().get('OPCODES_%s_%s' % python_version)
+        globals()['OPCODE_MAPPER'] = ops
         for op_code, op_name in ops.items():
             op_cls = type(op_name, (Opcode, ), {'OP_CODE': op_code})
             globals()[op_name] = op_cls

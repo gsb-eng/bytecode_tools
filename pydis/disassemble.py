@@ -7,6 +7,8 @@ bytecode sequence.
 
 from pydis.marshal import load
 
+from pydis.opcodes import opcodes
+
 
 def line_no_table(code):
     """co_lnotab is an array of unsigned bytes, which holds differences in
@@ -134,8 +136,66 @@ def line_no_table(code):
         yield(addr, lineno)
 
 
-def get_labels():
-    pass
+class DecodeCode:
+
+    def __init__(self, code, python_version=(3, 0)):
+        self.code = code
+        assert isinstance(self.code, bytes)
+        self.python_version = python_version
+
+        # Generate opcode classes and mapper for given python version.
+        opcodes.OpcodeClassFactory.gen_opcode_classes(
+            python_version=python_version)
+
+    def _bytecode(self):
+        pass
+
+    def _wordcode(self):
+        unpacked_code = self._unpack_wordcode()
+        labels = self.findlabels(unpacked_code)
+        linestarts = dict(line_no_table(self.code))
+
+    def findlabels(self, unpacked_code=None):
+        labels = []
+        if unpacked_code is None:
+            unpacked_code = self._unpack_wordcode()
+
+        for offset, op_code, arg in unpacked_code:
+            if arg:
+                if op_code.has_jrel():
+                    target = offset + 2 + arg
+                elif op_code.has_jabs():
+                    target = arg
+                else:
+                    continue
+
+                if target not in labels:
+                    labels.append(target)
+        return labels
+
+
+    def _unpack_wordcode(self):
+        extended_arg = 0
+        for i in range(0, len(self.code, 2)):
+
+            op_code = getattr(opcodes, opcodes.OPCODE_MAPPER[self.code[i]])
+            if op_code.has_arg():
+                arg = self.code[i + 1] | extended_arg
+                extended_arg = arg << 8 if op_code.is_extended_arg() else 0
+            else:
+                arg = None
+
+            yield (i, op_code, arg)
+
+
+    def unpack_code(self):
+        if self.python_version >= (3, 6):
+            self._wordcode()
+        else:
+            self._wordcode()
+
+    def findlabels():
+        pass
 
 
 class Instruction:
