@@ -138,14 +138,54 @@ def line_no_table(code):
 
 class DecodeCode:
 
-    def __init__(self, code, python_version=(3, 0)):
-        self.code = code
+    def __init__(
+        self,
+        code,
+        constants,
+        names,
+        varnames,
+        freevars,
+        python_version=(3, 0)):
+
         assert isinstance(self.code, bytes)
+        self.code = code
+        self.constants = constants
+        self.names = names
+        self.varnames = varnames
+        self.freevars = freevars
         self.python_version = python_version
 
         # Generate opcode classes and mapper for given python version.
         opcodes.OpcodeClassFactory.gen_opcode_classes(
             python_version=python_version)
+
+
+    def _get_const_info(self, const_index):
+        """Helper to get optional details about const references
+
+           Returns the dereferenced constant and its repr if the constant
+           list is defined.
+           Otherwise returns the constant index and its repr().
+        """
+        argval = const_index
+        if const_list is not None:
+            argval = self.constants[const_index]
+        return argval, repr(argval)
+
+    def _get_name_info(name_index, name_list):
+        """Helper to get optional details about named references
+
+           Returns the dereferenced name as both value and repr if the name
+           list is defined.
+           Otherwise returns the name index and its repr().
+        """
+        argval = name_index
+        if name_list is not None:
+            argval = name_list[name_index]
+            argrepr = argval
+        else:
+            argrepr = repr(argval)
+        return argval, argrepr
 
     def _bytecode(self):
         pass
@@ -154,6 +194,31 @@ class DecodeCode:
         unpacked_code = self._unpack_wordcode()
         labels = self.findlabels(unpacked_code)
         linestarts = dict(line_no_table(self.code))
+
+        for offset, op_code, arg in unpacked_code:
+            if arg:
+                if op_code.has_const():
+                    argval, argrepr = self._get_const_info(arg)
+                elif op_code.has_name():
+                    argval, argrepr = self._get_name_info(arg, self.names)
+                elif op_code.has_local():
+                    argval, argrepr = self._get_name_info(arg, self.varnames)
+                elif op_code.has_free():
+                    argval, argrepr = self._get_name_info(arg, self.freevars)
+                elif op_code.has_com():
+                    argval = op_codes.COM_OP[arg]
+                    argrepr = repr(argval)
+                else:
+                    argval, argrepr = arg, repr(arg)
+
+            yield op_code(
+                offset,
+                linestarts[offset],
+                arg,
+                argval,
+                argrepr,
+                offset in labels
+            )
 
     def findlabels(self, unpacked_code=None):
         labels = []
@@ -173,7 +238,6 @@ class DecodeCode:
                     labels.append(target)
         return labels
 
-
     def _unpack_wordcode(self):
         extended_arg = 0
         for i in range(0, len(self.code, 2)):
@@ -186,7 +250,6 @@ class DecodeCode:
                 arg = None
 
             yield (i, op_code, arg)
-
 
     def unpack_code(self):
         if self.python_version >= (3, 6):

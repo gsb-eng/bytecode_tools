@@ -176,6 +176,8 @@ OPCODES_3_7.update({
 
 HAS_ARGUMENT = 90  # Opcode > 90 have arguments to deal with
 EXTENDED_ARG = 144  # Extended argument opcode number.
+FORMAT_VALUE = 155
+MAKE_FUNCTION = 132
 
 # Opcodes with name table lookup required.
 NAME_OPCODES = (
