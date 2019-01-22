@@ -113,5 +113,6 @@ class OpcodeClassFactory:
                 {'OPCODE': op_code, 'OPCODE_NAME': op_name}
             )
             globals()[op_name] = op_cls
+
         opcodes_generated = True
         opcodes_version = python_version

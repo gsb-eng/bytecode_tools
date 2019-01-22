@@ -195,6 +195,8 @@ class DecodeCode:
         labels = self.findlabels(unpacked_code)
         linestarts = dict(line_no_table(self.code))
 
+        is_jump_target = offset in labels
+
         for offset, op_code, arg in unpacked_code:
             if arg:
                 if op_code.has_const():
@@ -213,11 +215,11 @@ class DecodeCode:
 
             yield op_code(
                 offset,
-                linestarts[offset],
+                linestarts[offset],  # Line number for the given offset.
                 arg,
                 argval,
                 argrepr,
-                offset in labels
+                is_jump_target
             )
 
     def findlabels(self, unpacked_code=None):
