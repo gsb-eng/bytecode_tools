@@ -1,6 +1,6 @@
 from .constants import (
-    CMP_OP, HAS_ARGUMENT, EXTENDED_ARG, FORMAT_VALUE, MAKE_FUNCTION,
-    OPCODES_3_0, OPCODES_3_5, OPCODES_3_6, OPCODES_3_7,
+    CMP_OP, HAS_ARGUMENT, EXTENDED_ARG_CODE, FORMAT_VALUE_CODE,
+    MAKE_FUNCTION_CODE, OPCODES_3_0, OPCODES_3_5, OPCODES_3_6, OPCODES_3_7,
 
     # Opcode flags
     HAS_COM, HAS_CONST, HAS_FREE, HAS_JREL, HAS_JABS, HAS_LOCAL,
@@ -10,6 +10,8 @@ from .constants import (
     CMP_OPCODES, CONST_OPCODES, FREE_OPCODES, JREL_OPCODES,
     JABS_OPCODES, LOCAL_OPCODES, NAME_OPCODES, NARGS_OPCODES
 )
+
+MAKE_FUNCTION_FLAGS = ('defaults', 'kwdefaults', 'annotations', 'closure')
 
 
 class Opcode:
@@ -33,8 +35,7 @@ class Opcode:
         self.arg = arg
         self.arg_val = arg_val
         self.arg_repr = arg_repr
-        self.is_jump_target = None
-        self.code = None
+        self.is_jump_target = is_jump_target
 
     def __repr__(self):
         return self.__class__.__name__
@@ -76,20 +77,20 @@ class Opcode:
         return cls.OPCODE >= HAS_ARGUMENT
 
     @classmethod
-    def has_com(self):
+    def has_cmp(cls):
         return cls.OPCODE in CMP_OPCODES
 
     @classmethod
-    def is_extended_arg(self):
-        return cls.OPCODE == EXTENDED_ARG
+    def is_extended_arg(cls):
+        return cls.OPCODE == EXTENDED_ARG_CODE
 
     @classmethod
-    def is_format_value(self):
-        return cls.OPCODE == FORMAT_VALUE
+    def is_format_value(cls):
+        return cls.OPCODE == FORMAT_VALUE_CODE
 
     @classmethod
-    def is_make_function(self):
-        return cls.OPCODE == MAKE_FUNCTION
+    def is_make_function(cls):
+        return cls.OPCODE == MAKE_FUNCTION_CODE
 
 
 class OpcodeClassFactory:
@@ -98,10 +99,10 @@ class OpcodeClassFactory:
     opcodes_version = None
 
     @classmethod
-    def gen_opcode_classes(self, python_version=(3, 0)):
+    def gen_opcode_classes(cls, python_version=(3, 0)):
 
         # If they are already generated, then no need to do it again.
-        if opcodes_generated and opcodes_version == python_version:
+        if cls.opcodes_generated and cls.opcodes_version == python_version:
             return
         # If no version passed, then consider default python 3 opcodes.
         ops = globals().get('OPCODES_%s_%s' % python_version)
@@ -114,5 +115,5 @@ class OpcodeClassFactory:
             )
             globals()[op_name] = op_cls
 
-        opcodes_generated = True
-        opcodes_version = python_version
+        cls.opcodes_generated = True
+        cls.opcodes_version = python_version
