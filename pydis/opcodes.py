@@ -99,13 +99,15 @@ class OpcodeClassFactory:
     opcodes_version = None
 
     @classmethod
-    def gen_opcode_classes(cls, python_version=(3, 0)):
+    def gen_opcode_classes(cls, python_version=3.0):
 
         # If they are already generated, then no need to do it again.
         if cls.opcodes_generated and cls.opcodes_version == python_version:
             return
         # If no version passed, then consider default python 3 opcodes.
-        ops = globals().get('OPCODES_%s_%s' % python_version)
+        ops = globals().get(
+            'OPCODES_%s_%s' % tuple(str(python_version).split('.')))
+
         globals()['OPCODE_MAPPER'] = ops
         for op_code, op_name in ops.items():
             op_cls = type(
