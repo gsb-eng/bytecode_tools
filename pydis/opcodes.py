@@ -8,7 +8,9 @@ from .constants import (
 
     # Opcodes classifications
     CMP_OPCODES, CONST_OPCODES, FREE_OPCODES, JREL_OPCODES,
-    JABS_OPCODES, LOCAL_OPCODES, NAME_OPCODES, NARGS_OPCODES
+    JABS_OPCODES, LOCAL_OPCODES, NAME_OPCODES, NARGS_OPCODES,
+
+    PY_VERSION
 )
 
 MAKE_FUNCTION_FLAGS = ('defaults', 'kwdefaults', 'annotations', 'closure')
@@ -99,8 +101,7 @@ class OpcodeClassFactory:
     opcodes_version = None
 
     @classmethod
-    def gen_opcode_classes(cls, python_version=3.0):
-
+    def gen_opcode_classes(cls, python_version=PY_VERSION):
         # If they are already generated, then no need to do it again.
         if cls.opcodes_generated and cls.opcodes_version == python_version:
             return

@@ -11,7 +11,7 @@ import struct
 from pydis.constants import (
     IS_PY3, MAGIC_NUMBERS, PYC_MIME_TYPE, V3, V4
 )
-from pydis.marshal import load
+from pydis.unmarshal import load
 
 
 def __read_unsigned_int(fp):
