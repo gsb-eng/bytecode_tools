@@ -47,6 +47,11 @@ class DecodeCodeObject:
 
         self.labels = None
         self.linestarts = None
+        self.reader = (
+            self._unpack_wordcode
+            if self.python_version >= 3.6
+            else self._unpack_bytecode
+        )
 
     def _disassemble(
         self,
@@ -146,51 +151,6 @@ class DecodeCodeObject:
         else:
             argrepr = repr(argval)
         return argval, argrepr
-
-    def _bytecode(self):
-        pass
-
-    def _wordcode(self):
-
-        self.labels = self.findlabels(unpacked_code=self._unpack_wordcode())
-        self.linestarts = dict(self.line_no_table())
-
-        lis = []
-
-        for offset, op_code, arg in self._unpack_wordcode():
-
-            argval = None
-            argrepr = ''
-            line_start = self.linestarts.get(offset, None)
-            is_jump_target = offset in self.labels
-            if arg:
-                argval = arg
-                if op_code.has_const():
-                    argval, argrepr = self._get_const_info(arg)
-                elif op_code.has_name():
-                    argval, argrepr = self._get_name_info(arg, self.names)
-                elif op_code.has_local():
-                    argval, argrepr = self._get_name_info(arg, self.varnames)
-                elif op_code.has_free():
-                    argval, argrepr = self._get_name_info(arg, self.freevars)
-                elif op_code.has_cmp():
-                    argval = opcodes.CMP_OP[arg]
-                    argrepr = repr(argval)
-                elif op_code.is_make_function():
-                    argrepr = ', '.join(
-                        s for i, s in enumerate(opcodes.MAKE_FUNCTION_FLAGS)
-                        if arg & (1<<i)
-                    )
-
-            lis.append(op_code(
-                offset,
-                line_start,
-                arg,
-                argval,
-                argrepr,
-                is_jump_target
-            ))
-        return lis
 
     def line_no_table(self):
         """co_lnotab is an array of unsigned bytes, which holds differences in
@@ -320,9 +280,9 @@ class DecodeCodeObject:
     def findlabels(self, unpacked_code=None):
         labels = []
         if unpacked_code is None:
-            unpacked_code = self._unpack_wordcode()
+            unpacked_code = self.reader()
 
-        for offset, op_code, arg in unpacked_code:
+        for offset, end, op_code, arg in unpacked_code:
             if arg:
                 if op_code.has_jrel():
                     target = offset + 2 + arg
@@ -335,6 +295,88 @@ class DecodeCodeObject:
                     labels.append(target)
         return labels
 
+    def unpack_code(self):
+
+        self.labels = self.findlabels(unpacked_code=self.reader())
+        self.linestarts = dict(self.line_no_table())
+
+        lis = []
+
+        for offset, end, op_code, arg in self.reader():
+
+            argval = None
+            argrepr = ''
+            line_start = self.linestarts.get(offset, None)
+            is_jump_target = offset in self.labels
+            if arg:
+                argval = arg
+                if op_code.has_const():
+                    argval, argrepr = self._get_const_info(arg)
+                elif op_code.has_name():
+                    argval, argrepr = self._get_name_info(arg, self.names)
+                elif op_code.has_local():
+                    argval, argrepr = self._get_name_info(arg, self.varnames)
+                elif op_code.has_free():
+                    argval, argrepr = self._get_name_info(arg, self.freevars)
+                elif op_code.has_cmp():
+                    argval = opcodes.CMP_OP[arg]
+                    argrepr = repr(argval)
+                elif op_code.is_make_function():
+                    argrepr = ', '.join(
+                        s for i, s in enumerate(opcodes.MAKE_FUNCTION_FLAGS)
+                        if arg & (1<<i)
+                    )
+
+            lis.append(op_code(
+                offset,
+                end,
+                line_start,
+                arg,
+                argval,
+                argrepr,
+                is_jump_target
+            ))
+        return lis
+
+    def _unpack_bytecode(self):
+        # Unlike wordcode, bytecode doesn't have fixed 16 byte words.
+        pos = 0
+        extended_arg = 0
+        offset = 0
+        size = len(self.code)
+
+        while pos < size:
+            arg = None
+            op_code = getattr(opcodes, opcodes.OPCODE_MAPPER[self.code[i]])
+            if op_code.has_arg():
+                factor = 0
+                if op_code.is_extended_arg():
+                    assert not extended_arg
+                    factor = 2
+
+                temp_arg = (
+                    self.code[pos+1] << (8 * factor) |
+                    self.code[pos+2] << (8 * (factor + 1))
+                )
+                if factor:
+                    extended_arg = temp_arg
+                    arg = None
+                else:
+                    arg = temp_arg
+                    arg |= extended_arg
+
+                bytes_tread  = 3
+            else:
+                # EXTENDED_ARG should be infront of any opcode with arg, if not
+                # there is a problem
+                assert not extended_arg
+                extended_arg = 0
+                bytes_read = 1
+
+            yield (offset, pos + bytes_read, op_code, arg)
+            offset = pos + bytes_read
+            pos += bytes_read
+
     def _unpack_wordcode(self):
         extended_arg = 0
         for i in range(0, len(self.code), 2):
@@ -346,13 +388,7 @@ class DecodeCodeObject:
                 extended_arg = arg << 8 if op_code.is_extended_arg() else 0
             else:
                 arg = None
-            yield (i, op_code, arg)
-
-    def unpack_code(self):
-        if self.python_version >= 3.6:
-            return self._wordcode()
-        else:
-            return self._wordcode()
+            yield (i, i+2, op_code, arg)
 
 
 def _try_compile(source, name):
@@ -417,6 +453,7 @@ def dis(x=None, *, file=None, depth=None):
 def _disassemble_str(source, **kwargs):
     """Compile the source string, then disassemble the code object."""
     disassemble_recursive(_try_compile(source, '<dis>'), **kwargs)
+
 
 def distb(tb=None, *, file=None):
     """Disassemble a traceback (default: last traceback).

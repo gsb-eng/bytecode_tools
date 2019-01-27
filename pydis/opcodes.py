@@ -26,6 +26,7 @@ class Opcode:
     def __init__(
         self,
         offset,
+        end,
         line,
         arg,
         arg_val,
@@ -33,6 +34,7 @@ class Opcode:
         is_jump_target):
 
         self.offset = offset
+        self.end = end
         self.line = line
         self.arg = arg
         self.arg_val = arg_val
@@ -104,6 +106,7 @@ class OpcodeClassFactory:
     def gen_opcode_classes(cls, python_version=PY_VERSION):
         # If they are already generated, then no need to do it again.
         if cls.opcodes_generated and cls.opcodes_version == python_version:
+
             return
         # If no version passed, then consider default python 3 opcodes.
         ops = globals().get(
