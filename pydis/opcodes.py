@@ -1,6 +1,7 @@
 from .constants import (
-    CMP_OP, HAS_ARGUMENT, EXTENDED_ARG_CODE, FORMAT_VALUE_CODE,
-    MAKE_FUNCTION_CODE, OPCODES_3_0, OPCODES_3_5, OPCODES_3_6, OPCODES_3_7,
+    CMP_OP, HAS_ARGUMENT, EXTENDED_ARG_CODE_2, EXTENDED_ARG_CODE_3,
+    FORMAT_VALUE_CODE, MAKE_FUNCTION_CODE, OPCODES_3_0, OPCODES_3_4,
+    OPCODES_3_5, OPCODES_3_6, OPCODES_3_7,
 
     # Opcode flags
     HAS_COM, HAS_CONST, HAS_FREE, HAS_JREL, HAS_JABS, HAS_LOCAL,
@@ -22,6 +23,7 @@ class Opcode:
     # be defined at class level.
     OPCODE = None
     OPCODE_NAME = None
+    PYTHON_VERSION = None
 
     def __init__(
         self,
@@ -86,7 +88,10 @@ class Opcode:
 
     @classmethod
     def is_extended_arg(cls):
-        return cls.OPCODE == EXTENDED_ARG_CODE
+        if self.PYTHON_VERSION >= 3:
+            cls.OPCODE == EXTENDED_ARG_CODE_3
+        else:
+            return cls.OPCODE == EXTENDED_ARG_CODE_2
 
     @classmethod
     def is_format_value(cls):
@@ -117,7 +122,11 @@ class OpcodeClassFactory:
             op_cls = type(
                 op_name,
                 (Opcode, ),
-                {'OPCODE': op_code, 'OPCODE_NAME': op_name}
+                {
+                    'OPCODE': op_code,
+                    'OPCODE_NAME': op_nam,
+                    'PYTHON_VERSION': python_version
+                }
             )
             globals()[op_name] = op_cls
 

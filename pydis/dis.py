@@ -297,6 +297,7 @@ class DecodeCodeObject:
 
     def unpack_code(self):
 
+        # import pdb;pdb.set_trace()
         self.labels = self.findlabels(unpacked_code=self.reader())
         self.linestarts = dict(self.line_no_table())
 
@@ -347,7 +348,7 @@ class DecodeCodeObject:
 
         while pos < size:
             arg = None
-            op_code = getattr(opcodes, opcodes.OPCODE_MAPPER[self.code[i]])
+            op_code = getattr(opcodes, opcodes.OPCODE_MAPPER[self.code[pos]])
             if op_code.has_arg():
                 factor = 0
                 if op_code.is_extended_arg():
@@ -365,7 +366,7 @@ class DecodeCodeObject:
                     arg = temp_arg
                     arg |= extended_arg
 
-                bytes_tread  = 3
+                bytes_read  = 3
             else:
                 # EXTENDED_ARG should be infront of any opcode with arg, if not
                 # there is a problem
@@ -382,7 +383,6 @@ class DecodeCodeObject:
         for i in range(0, len(self.code), 2):
 
             op_code = getattr(opcodes, opcodes.OPCODE_MAPPER[self.code[i]])
-
             if op_code.has_arg():
                 arg = self.code[i + 1] | extended_arg
                 extended_arg = arg << 8 if op_code.is_extended_arg() else 0

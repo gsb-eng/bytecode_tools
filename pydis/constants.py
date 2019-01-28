@@ -325,6 +325,36 @@ OPCODES = {
     161: 'CALL_METHOD'
 }
 
+OPCODES_2 = OPCODES.copy()
+OPCODES_2.update({
+    0: 'STOP_CODE',
+    5: 'ROT_FOUR',  # DUP_TOP_TWO in PYTHON_3
+    13: 'UNARY_CONVERT',
+    21: 'BINARY_DIVIDE',
+    30: 'SLICE_0',  # 30 to 53 are removed in PYTHON_3
+    31: 'SLICE_1',
+    32: 'SLICE_2',
+    33: 'SLICE_3',
+    40: 'STORE_SLICE_0',
+    41: 'STORE_SLICE_1',
+    42: 'STORE_SLICE_2',
+    43: 'STORE_SLICE_3',
+    50: 'DELETE_SLICE_0',
+    51: 'DELETE_SLICE_1',
+    52: 'DELETE_SLICE_2',
+    53: 'DELETE_SLICE_3',
+    58: 'INPLACE_DIVIDE',
+    71: 'PRINT_ITEM',
+    72: 'PRINT_NEWLINE',
+    82: 'LOAD_LOCALS',
+    85: 'EXEC_STMT',
+    89: 'BUILD_CLASS',
+    94: 'LIST_APPEND',
+    99: 'DUP_TOPX',
+    145: 'EXTENDED_ARG'
+})
+
+
 OPCODES_3_0 = OPCODES.copy()
 
 OPCODES_3_1 = OPCODES.copy()
@@ -332,6 +362,8 @@ OPCODES_3_1 = OPCODES.copy()
 OPCODES_3_2 = OPCODES.copy()
 
 OPCODES_3_3 = OPCODES.copy()
+
+OPCODES_3_4 = OPCODES.copy()
 
 OPCODES_3_5 = OPCODES.copy()
 
@@ -367,7 +399,8 @@ OPCODES_3_7.update({
 HAS_ARGUMENT = 90  # Opcode > 90 have arguments to deal with
 
 # We don't want the name conflict in opcodes module.
-EXTENDED_ARG_CODE = 144  # Extended argument opcode number.
+EXTENDED_ARG_CODE_2 = 145
+EXTENDED_ARG_CODE_3 = 144  # Extended argument opcode number.
 FORMAT_VALUE_CODE = 155
 MAKE_FUNCTION_CODE = 132
 
