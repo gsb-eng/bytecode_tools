@@ -1,7 +1,7 @@
 from .constants import (
-    CMP_OP, HAS_ARGUMENT, EXTENDED_ARG_CODE_2, EXTENDED_ARG_CODE_3,
-    FORMAT_VALUE_CODE, MAKE_FUNCTION_CODE, OPCODES_3_0, OPCODES_3_4,
-    OPCODES_3_5, OPCODES_3_6, OPCODES_3_7,
+    CMP_OP, HAS_ARGUMENT, EXTENDED_ARG_NAME, FORMAT_VALUE_NAME,
+    MAKE_FUNCTION_NAME, OPCODES_3_0, OPCODES_3_4, OPCODES_3_5, OPCODES_3_6,
+    OPCODES_3_7,
 
     # Opcode flags
     HAS_COM, HAS_CONST, HAS_FREE, HAS_JREL, HAS_JABS, HAS_LOCAL,
@@ -88,18 +88,15 @@ class Opcode:
 
     @classmethod
     def is_extended_arg(cls):
-        if self.PYTHON_VERSION >= 3:
-            cls.OPCODE == EXTENDED_ARG_CODE_3
-        else:
-            return cls.OPCODE == EXTENDED_ARG_CODE_2
+        return cls.OPCODE_NAME == EXTENDED_ARG_NAME
 
     @classmethod
     def is_format_value(cls):
-        return cls.OPCODE == FORMAT_VALUE_CODE
+        return cls.OPCODE_NAME == FORMAT_VALUE_NAME
 
     @classmethod
     def is_make_function(cls):
-        return cls.OPCODE == MAKE_FUNCTION_CODE
+        return cls.OPCODE_NAME == MAKE_FUNCTION_NAME
 
 
 class OpcodeClassFactory:
