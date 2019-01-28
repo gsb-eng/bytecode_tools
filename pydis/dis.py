@@ -348,7 +348,7 @@ class DecodeCodeObject:
 
         while pos < size:
             arg = None
-            op_code = getattr(opcodes, opcodes.OPCODE_MAPPER[self.code[pos]])
+            op_code = getattr(opcodes, opcodes.OPCODE_MAPPER[self.code[pos]][0])
             if op_code.has_arg():
                 factor = 0
                 if op_code.is_extended_arg():
@@ -382,7 +382,7 @@ class DecodeCodeObject:
         extended_arg = 0
         for i in range(0, len(self.code), 2):
 
-            op_code = getattr(opcodes, opcodes.OPCODE_MAPPER[self.code[i]])
+            op_code = getattr(opcodes, opcodes.OPCODE_MAPPER[self.code[i]][0])
             if op_code.has_arg():
                 arg = self.code[i + 1] | extended_arg
                 extended_arg = arg << 8 if op_code.is_extended_arg() else 0

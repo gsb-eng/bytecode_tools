@@ -196,276 +196,299 @@ HAS_NAME = 2
 HAS_JREL = 4
 HAS_JABS = 8
 HAS_LOCAL = 16
-HAS_COM = 32
+HAS_CMP = 32
 HAS_FREE = 64
-HAS_NARGS = 128
+HAS_ARG = 128
+HAS_NARGS = 256
+IS_EXTENDED_ARG = 512
+IS_MAKE_FUNCTION = 1024
+IS_FORMAT_VALUE = 2048
 
 CMP_OP = (
     '<', '<=', '==', '!=', '>', '>=', 'in', 'not in', 'is',
     'is not', 'exception match', 'BAD'
 )
 
-OPCODES = {
-    1: 'POP_TOP',
-    2: 'ROT_TWO',
-    3: 'ROT_THREE',
-    4: 'DUP_TOP',
-    5: 'DUP_TOP_TWO',
-    9: 'NOP',
-    10: 'UNARY_POSITIVE',
-    11: 'UNARY_NEGATIVE',
-    12: 'UNARY_NOT',
-    15: 'UNARY_INVERT',
-    16: 'BINARY_MATRIX_MULTIPLY',  # 16, 17 added newly in 3.5
-    17: 'INPLACE_MATRIX_MULTIPLY',
-    19: 'BINARY_POWER',
-    20: 'BINARY_MULTIPLY',
-    22: 'BINARY_MODULO',
-    23: 'BINARY_ADD',
-    24: 'BINARY_SUBTRACT',
-    25: 'BINARY_SUBSCR',
-    26: 'BINARY_FLOOR_DIVIDE',
-    27: 'BINARY_TRUE_DIVIDE',
-    28: 'INPLACE_FLOOR_DIVIDE',
-    29: 'INPLACE_TRUE_DIVIDE',
-    50: 'GET_AITER',
-    51: 'GET_ANEXT',
-    52: 'BEFORE_ASYNC_WITH',
-    54: 'STORE_MAP',
-    55: 'INPLACE_ADD',
-    56: 'INPLACE_SUBTRACT',
-    57: 'INPLACE_MULTIPLY',
-    59: 'INPLACE_MODULO',
-    60: 'STORE_SUBSCR',
-    61: 'DELETE_SUBSCR',
-    62: 'BINARY_LSHIFT',
-    63: 'BINARY_RSHIFT',
-    64: 'BINARY_AND',
-    65: 'BINARY_XOR',
-    66: 'BINARY_OR',
-    67: 'INPLACE_POWER',
-    68: 'GET_ITER',
-    69: 'STORE_LOCALS',
-    70: 'PRINT_EXPR',
-    71: 'LOAD_BUILD_CLASS',
-    72: 'YIELD_FROM',  #
-    73: 'GET_AWAITABLE',
-    75: 'INPLACE_LSHIFT',
-    76: 'INPLACE_RSHIFT',
-    77: 'INPLACE_AND',
-    78: 'INPLACE_XOR',
-    79: 'INPLACE_OR',
-    80: 'BREAK_LOOP',
-    81: 'WITH_CLEANUP',
-    82: 'WITH_CLEANUP_FINISH',  # Added newly in 3.5
-    83: 'RETURN_VALUE',
-    84: 'IMPORT_STAR',
-    86: 'YIELD_VALUE',
-    87: 'POP_BLOCK',
-    88: 'END_FINALLY',
-    89: 'POP_EXCEPT',  # BUILD_CLASS in Python 2
-    90: 'STORE_NAME',
-    91: 'DELETE_NAME',
-    92: 'UNPACK_SEQUENCE',
-    93: 'FOR_ITER',
-    94: 'UNPACK_EX',  # LIST_APPEND in Python 2
-    95: 'STORE_ATTR',
-    96: 'DELETE_ATTR',
-    97: 'STORE_GLOBAL',
-    98: 'DELETE_GLOBAL',
-    100: 'LOAD_CONST',
-    101: 'LOAD_NAME',
-    102: 'BUILD_TUPLE',
-    103: 'BUILD_LIST',
-    104: 'BUILD_SET',
-    105: 'BUILD_MAP',
-    106: 'LOAD_ATTR',
-    107: 'COMPARE_OP',
-    108: 'IMPORT_NAME',
-    109: 'IMPORT_FROM',
-    110: 'JUMP_FORWARD',
-    111: 'JUMP_IF_FALSE_OR_POP',
-    112: 'JUMP_IF_TRUE_OR_POP',
-    113: 'JUMP_ABSOLUTE',
-    114: 'POP_JUMP_IF_FALSE',
-    115: 'POP_JUMP_IF_TRUE',
-    116: 'LOAD_GLOBAL',
-    119: 'CONTINUE_LOOP',
-    120: 'SETUP_LOOP',
-    121: 'SETUP_EXCEPT',
-    122: 'SETUP_FINALLY',
-    124: 'LOAD_FAST',
-    125: 'STORE_FAST',
-    126: 'DELETE_FAST',
-    130: 'RAISE_VARARGS',
-    131: 'CALL_FUNCTION',
-    132: 'MAKE_FUNCTION',
-    133: 'BUILD_SLICE',
-    134: 'MAKE_CLOSURE',
-    135: 'LOAD_CLOSURE',
-    136: 'LOAD_DEREF',
-    137: 'STORE_DEREF',
-    138: 'DELETE_DEREF',
-    140: 'CALL_FUNCTION_VAR',
-    141: 'CALL_FUNCTION_KW',
-    142: 'CALL_FUNCTION_VAR_KW',
-    143: 'SETUP_WITH',
-    144: 'EXTENDED_ARG',
-    145: 'LIST_APPEND',
-    146: 'SET_ADD',
-    147: 'MAP_ADD',
-    148: 'LOAD_CLASSDEREF',
-    149: 'BUILD_LIST_UNPACK',  # 149 to 153 newly added in 3.5
-    150: 'BUILD_MAP_UNPACK',
-    151: 'BUILD_MAP_UNPACK_WITH_CALL',
-    152: 'BUILD_TUPLE_UNPACK',
-    153: 'BUILD_SET_UNPACK',
-    154: 'SETUP_ASYNC_WITH',
-    160: 'LOAD_METHOD',  # 160, 161 added newly in 3.5
-    161: 'CALL_METHOD'
+OPCODES_3 = {
+    1: ('POP_TOP', 0),
+    2: ('ROT_TWO', 0),
+    3: ('ROT_THREE', 0),
+    4: ('DUP_TOP', 0),
+    5: ('DUP_TOP_TWO', 0),
+    9: ('NOP', 0),
+    10: ('UNARY_POSITIVE', 0),
+    11: ('UNARY_NEGATIVE', 0),
+    12: ('UNARY_NOT', 0),
+    15: ('UNARY_INVERT', 0),
+    16: ('BINARY_MATRIX_MULTIPLY', 0),
+    17: ('INPLACE_MATRIX_MULTIPLY', 0),
+    19: ('BINARY_POWER', 0),
+    20: ('BINARY_MULTIPLY', 0),
+    22: ('BINARY_MODULO', 0),
+    23: ('BINARY_ADD', 0),
+    24: ('BINARY_SUBTRACT', 0),
+    25: ('BINARY_SUBSCR', 0),
+    26: ('BINARY_FLOOR_DIVIDE', 0),
+    27: ('BINARY_TRUE_DIVIDE', 0),
+    28: ('INPLACE_FLOOR_DIVIDE', 0),
+    29: ('INPLACE_TRUE_DIVIDE', 0),
+    50: ('GET_AITER', 0),
+    51: ('GET_ANEXT', 0),
+    52: ('BEFORE_ASYNC_WITH', 0),
+    54: ('STORE_MAP', 0),
+    55: ('INPLACE_ADD', 0),
+    56: ('INPLACE_SUBTRACT', 0),
+    57: ('INPLACE_MULTIPLY', 0),
+    59: ('INPLACE_MODULO', 0),
+    60: ('STORE_SUBSCR', 0),
+    61: ('DELETE_SUBSCR', 0),
+    62: ('BINARY_LSHIFT', 0),
+    63: ('BINARY_RSHIFT', 0),
+    64: ('BINARY_AND', 0),
+    65: ('BINARY_XOR', 0),
+    66: ('BINARY_OR', 0),
+    67: ('INPLACE_POWER', 0),
+    68: ('GET_ITER', 0),
+    69: ('STORE_LOCALS', 0),
+    70: ('PRINT_EXPR', 0),
+    71: ('LOAD_BUILD_CLASS', 0),
+    72: ('YIELD_FROM', 0),
+    73: ('GET_AWAITABLE', 0),
+    75: ('INPLACE_LSHIFT', 0),
+    76: ('INPLACE_RSHIFT', 0),
+    77: ('INPLACE_AND', 0),
+    78: ('INPLACE_XOR', 0),
+    79: ('INPLACE_OR', 0),
+    80: ('BREAK_LOOP', 0),
+    81: ('WITH_CLEANUP', 0),
+    82: ('WITH_CLEANUP_FINISH', 0),
+    83: ('RETURN_VALUE', 0),
+    84: ('IMPORT_STAR', 0),
+    86: ('YIELD_VALUE', 0),
+    87: ('POP_BLOCK', 0),
+    88: ('END_FINALLY', 0),
+    89: ('POP_EXCEPT', 0),
+    90: ('STORE_NAME', 130),
+    91: ('DELETE_NAME', 130),
+    92: ('UNPACK_SEQUENCE', 128),
+    93: ('FOR_ITER', 132),
+    94: ('UNPACK_EX', 128),
+    95: ('STORE_ATTR', 130),
+    96: ('DELETE_ATTR', 130),
+    97: ('STORE_GLOBAL', 130),
+    98: ('DELETE_GLOBAL', 130),
+    100: ('LOAD_CONST', 129),
+    101: ('LOAD_NAME', 130),
+    102: ('BUILD_TUPLE', 128),
+    103: ('BUILD_LIST', 128),
+    104: ('BUILD_SET', 128),
+    105: ('BUILD_MAP', 128),
+    106: ('LOAD_ATTR', 130),
+    107: ('COMPARE_OP', 160),
+    108: ('IMPORT_NAME', 130),
+    109: ('IMPORT_FROM', 130),
+    110: ('JUMP_FORWARD', 132),
+    111: ('JUMP_IF_FALSE_OR_POP', 136),
+    112: ('JUMP_IF_TRUE_OR_POP', 136),
+    113: ('JUMP_ABSOLUTE', 136),
+    114: ('POP_JUMP_IF_FALSE', 136),
+    115: ('POP_JUMP_IF_TRUE', 136),
+    116: ('LOAD_GLOBAL', 130),
+    119: ('CONTINUE_LOOP', 128),
+    120: ('SETUP_LOOP', 128),
+    121: ('SETUP_EXCEPT', 128),
+    122: ('SETUP_FINALLY', 132),
+    124: ('LOAD_FAST', 144),
+    125: ('STORE_FAST', 144),
+    126: ('DELETE_FAST', 144),
+    130: ('RAISE_VARARGS', 128),
+    131: ('CALL_FUNCTION', 128),
+    132: ('MAKE_FUNCTION', 128),
+    133: ('BUILD_SLICE', 128),
+    134: ('MAKE_CLOSURE', 128),
+    135: ('LOAD_CLOSURE', 192),
+    136: ('LOAD_DEREF', 192),
+    137: ('STORE_DEREF', 192),
+    138: ('DELETE_DEREF', 192),
+    140: ('CALL_FUNCTION_VAR', 128),
+    141: ('CALL_FUNCTION_KW', 128),
+    142: ('CALL_FUNCTION_VAR_KW', 128),
+    143: ('SETUP_WITH', 132),
+    144: ('EXTENDED_ARG', 640),
+    145: ('LIST_APPEND', 128),
+    146: ('SET_ADD', 128),
+    147: ('MAP_ADD', 128),
+    148: ('LOAD_CLASSDEREF', 192),
+    149: ('BUILD_LIST_UNPACK', 128),
+    150: ('BUILD_MAP_UNPACK', 128),
+    151: ('BUILD_MAP_UNPACK_WITH_CALL', 128),
+    152: ('BUILD_TUPLE_UNPACK', 128),
+    153: ('BUILD_SET_UNPACK', 128),
+    154: ('SETUP_ASYNC_WITH', 132),
+    160: ('LOAD_METHOD', 130),
+    161: ('CALL_METHOD', 128),
 }
 
 # Taken Python-2.5 as base here.
 OPCODES_2 = {
-    0: 'STOP_CODE'
-    1: 'POP_TOP'
-    2: 'ROT_TWO'
-    3: 'ROT_THREE'
-    4: 'DUP_TOP'
-    5: 'ROT_FOUR'
-    9: 'NOP'
-    10: 'UNARY_POSITIVE'
-    11: 'UNARY_NEGATIVE'
-    12: 'UNARY_NOT'
-    13: 'UNARY_CONVERT'
-    15: 'UNARY_INVERT'
-    18: 'LIST_APPEND'
-    19: 'BINARY_POWER'
-    20: 'BINARY_MULTIPLY'
-    21: 'BINARY_DIVIDE'
-    22: 'BINARY_MODULO'
-    23: 'BINARY_ADD'
-    24: 'BINARY_SUBTRACT'
-    25: 'BINARY_SUBSCR'
-    26: 'BINARY_FLOOR_DIVIDE'
-    27: 'BINARY_TRUE_DIVIDE'
-    28: 'INPLACE_FLOOR_DIVIDE'
-    29: 'INPLACE_TRUE_DIVIDE'
-    30: 'SLICE+0'
-    31: 'SLICE+1'
-    32: 'SLICE+2'
-    33: 'SLICE+3'
-    40: 'STORE_SLICE+0'
-    41: 'STORE_SLICE+1'
-    42: 'STORE_SLICE+2'
-    43: 'STORE_SLICE+3'
-    50: 'DELETE_SLICE+0'
-    51: 'DELETE_SLICE+1'
-    52: 'DELETE_SLICE+2'
-    53: 'DELETE_SLICE+3'
-    55: 'INPLACE_ADD'
-    56: 'INPLACE_SUBTRACT'
-    57: 'INPLACE_MULTIPLY'
-    58: 'INPLACE_DIVIDE'
-    59: 'INPLACE_MODULO'
-    60: 'STORE_SUBSCR'
-    61: 'DELETE_SUBSCR'
-    62: 'BINARY_LSHIFT'
-    63: 'BINARY_RSHIFT'
-    64: 'BINARY_AND'
-    65: 'BINARY_XOR'
-    66: 'BINARY_OR'
-    67: 'INPLACE_POWER'
-    68: 'GET_ITER'
-    70: 'PRINT_EXPR'
-    71: 'PRINT_ITEM'
-    72: 'PRINT_NEWLINE'
-    73: 'PRINT_ITEM_TO'
-    74: 'PRINT_NEWLINE_TO'
-    75: 'INPLACE_LSHIFT'
-    76: 'INPLACE_RSHIFT'
-    77: 'INPLACE_AND'
-    78: 'INPLACE_XOR'
-    79: 'INPLACE_OR'
-    80: 'BREAK_LOOP'
-    81: 'WITH_CLEANUP'
-    82: 'LOAD_LOCALS'
-    83: 'RETURN_VALUE'
-    84: 'IMPORT_STAR'
-    85: 'EXEC_STMT'
-    86: 'YIELD_VALUE'
-    87: 'POP_BLOCK'
-    88: 'END_FINALLY'
-    89: 'BUILD_CLASS'
-    90: 'STORE_NAME'
-    91: 'DELETE_NAME'
-    92: 'UNPACK_SEQUENCE'
-    93: 'FOR_ITER'
-    95: 'STORE_ATTR'
-    96: 'DELETE_ATTR'
-    97: 'STORE_GLOBAL'
-    98: 'DELETE_GLOBAL'
-    99: 'DUP_TOPX'
-    100: 'LOAD_CONST'
-    101: 'LOAD_NAME'
-    102: 'BUILD_TUPLE'
-    103: 'BUILD_LIST'
-    104: 'BUILD_MAP'
-    105: 'LOAD_ATTR'
-    106: 'COMPARE_OP'
-    107: 'IMPORT_NAME'
-    108: 'IMPORT_FROM'
-    110: 'JUMP_FORWARD'
-    111: 'JUMP_IF_FALSE'
-    112: 'JUMP_IF_TRUE'
-    113: 'JUMP_ABSOLUTE'
-    116: 'LOAD_GLOBAL'
-    119: 'CONTINUE_LOOP'
-    120: 'SETUP_LOOP'
-    121: 'SETUP_EXCEPT'
-    122: 'SETUP_FINALLY'
-    124: 'LOAD_FAST'
-    125: 'STORE_FAST'
-    126: 'DELETE_FAST'
-    130: 'RAISE_VARARGS'
-    131: 'CALL_FUNCTION'
-    132: 'MAKE_FUNCTION'
-    133: 'BUILD_SLICE'
-    134: 'MAKE_CLOSURE'
-    135: 'LOAD_CLOSURE'
-    136: 'LOAD_DEREF'
-    137: 'STORE_DEREF'
-    140: 'CALL_FUNCTION_VAR'
-    141: 'CALL_FUNCTION_KW'
-    142: 'CALL_FUNCTION_VAR_KW'
-    143: 'EXTENDED_ARG'
-
+    0: ('STOP_CODE', 0),
+    1: ('POP_TOP', 0),
+    2: ('ROT_TWO', 0),
+    3: ('ROT_THREE', 0),
+    4: ('DUP_TOP', 0),
+    5: ('ROT_FOUR', 0),
+    9: ('NOP', 0),
+    10: ('UNARY_POSITIVE', 0),
+    11: ('UNARY_NEGATIVE', 0),
+    12: ('UNARY_NOT', 0),
+    13: ('UNARY_CONVERT', 0),
+    15: ('UNARY_INVERT', 0),
+    18: ('LIST_APPEND', 0),
+    19: ('BINARY_POWER', 0),
+    20: ('BINARY_MULTIPLY', 0),
+    21: ('BINARY_DIVIDE', 0),
+    22: ('BINARY_MODULO', 0),
+    23: ('BINARY_ADD', 0),
+    24: ('BINARY_SUBTRACT', 0),
+    25: ('BINARY_SUBSCR', 0),
+    26: ('BINARY_FLOOR_DIVIDE', 0),
+    27: ('BINARY_TRUE_DIVIDE', 0),
+    28: ('INPLACE_FLOOR_DIVIDE', 0),
+    29: ('INPLACE_TRUE_DIVIDE', 0),
+    30: ('SLICE+0', 0),
+    31: ('SLICE+1', 0),
+    32: ('SLICE+2', 0),
+    33: ('SLICE+3', 0),
+    40: ('STORE_SLICE+0', 0),
+    41: ('STORE_SLICE+1', 0),
+    42: ('STORE_SLICE+2', 0),
+    43: ('STORE_SLICE+3', 0),
+    50: ('DELETE_SLICE+0', 0),
+    51: ('DELETE_SLICE+1', 0),
+    52: ('DELETE_SLICE+2', 0),
+    53: ('DELETE_SLICE+3', 0),
+    55: ('INPLACE_ADD', 0),
+    56: ('INPLACE_SUBTRACT', 0),
+    57: ('INPLACE_MULTIPLY', 0),
+    58: ('INPLACE_DIVIDE', 0),
+    59: ('INPLACE_MODULO', 0),
+    60: ('STORE_SUBSCR', 0),
+    61: ('DELETE_SUBSCR', 0),
+    62: ('BINARY_LSHIFT', 0),
+    63: ('BINARY_RSHIFT', 0),
+    64: ('BINARY_AND', 0),
+    65: ('BINARY_XOR', 0),
+    66: ('BINARY_OR', 0),
+    67: ('INPLACE_POWER', 0),
+    68: ('GET_ITER', 0),
+    70: ('PRINT_EXPR', 0),
+    71: ('PRINT_ITEM', 0),
+    72: ('PRINT_NEWLINE', 0),
+    73: ('PRINT_ITEM_TO', 0),
+    74: ('PRINT_NEWLINE_TO', 0),
+    75: ('INPLACE_LSHIFT', 0),
+    76: ('INPLACE_RSHIFT', 0),
+    77: ('INPLACE_AND', 0),
+    78: ('INPLACE_XOR', 0),
+    79: ('INPLACE_OR', 0),
+    80: ('BREAK_LOOP', 0),
+    81: ('WITH_CLEANUP', 0),
+    82: ('LOAD_LOCALS', 0),
+    83: ('RETURN_VALUE', 0),
+    84: ('IMPORT_STAR', 0),
+    85: ('EXEC_STMT', 0),
+    86: ('YIELD_VALUE', 0),
+    87: ('POP_BLOCK', 0),
+    88: ('END_FINALLY', 0),
+    89: ('BUILD_CLASS', 0),
+    90: ('STORE_NAME', 130),
+    91: ('DELETE_NAME', 130),
+    92: ('UNPACK_SEQUENCE', 128),
+    93: ('FOR_ITER', 132),
+    95: ('STORE_ATTR', 130),
+    96: ('DELETE_ATTR', 130),
+    97: ('STORE_GLOBAL', 130),
+    98: ('DELETE_GLOBAL', 130),
+    99: ('DUP_TOPX', 128),
+    100: ('LOAD_CONST', 129),
+    101: ('LOAD_NAME', 130),
+    102: ('BUILD_TUPLE', 128),
+    103: ('BUILD_LIST', 128),
+    104: ('BUILD_MAP', 128),
+    105: ('LOAD_ATTR', 130),
+    106: ('COMPARE_OP', 160),
+    107: ('IMPORT_NAME', 130),
+    108: ('IMPORT_FROM', 130),
+    110: ('JUMP_FORWARD', 132),
+    111: ('JUMP_IF_FALSE', 132),
+    112: ('JUMP_IF_TRUE', 132),
+    113: ('JUMP_ABSOLUTE', 136),
+    116: ('LOAD_GLOBAL', 130),
+    119: ('CONTINUE_LOOP', 136),
+    120: ('SETUP_LOOP', 132),
+    121: ('SETUP_EXCEPT', 132),
+    122: ('SETUP_FINALLY', 132),
+    124: ('LOAD_FAST', 144),
+    125: ('STORE_FAST', 144),
+    126: ('DELETE_FAST', 144),
+    130: ('RAISE_VARARGS', 128),
+    131: ('CALL_FUNCTION', 128),
+    132: ('MAKE_FUNCTION', 128),
+    133: ('BUILD_SLICE', 128),
+    134: ('MAKE_CLOSURE', 128),
+    135: ('LOAD_CLOSURE', 192),
+    136: ('LOAD_DEREF', 192),
+    137: ('STORE_DEREF', 192),
+    140: ('CALL_FUNCTION_VAR', 128),
+    141: ('CALL_FUNCTION_KW', 128),
+    142: ('CALL_FUNCTION_VAR_KW', 128),
+    143: ('EXTENDED_ARG', 640)
 }
 OPCODES_2_5 = OPCODES_2.copy()
 
 OPCODES_2_6 = OPCODES_2.copy()
 OPCODES_2_6.update({
-    54: 'STORE_MAP',
-    94: 'LIST_APPEND'
+    54: ('STORE_MAP', 0)
 })
-OPCODES_2_6.pop(18)  # LIST_APPND has been changed to 94 from 18
 
-OPCODES_3_0 = OPCODES.copy()
+OPCODES_2_7 = OPCODES_2_6.copy()
+OPCODES_2_7.update({
+    104: ('BUILD_SET', 128),
+    105: ('BUILD_MAP', 128),
+    106: ('LOAD_ATTR', 130),
+    107: ('COMPARE_OP', 160),
+    108: ('IMPORT_NAME', 130),
+    109: ('IMPORT_FROM', 130),
+    111: ('JUMP_IF_FALSE_OR_POP', 136),
+    112: ('JUMP_IF_TRUE_OR_POP', 136),
+    114: ('POP_JUMP_IF_FALSE', 136),
+    115: ('POP_JUMP_IF_TRUE', 136),
+    143: ('SETUP_WITH', 132),
+    145: ('EXTENDED_ARG', 640),
+    146: ('SET_ADD', 128),
+    147: ('MAP_ADD', 128)
 
-OPCODES_3_1 = OPCODES.copy()
+})
 
-OPCODES_3_2 = OPCODES.copy()
+OPCODES_2_7.pop(18)  # LIST_APPND has been changed to 94 from 18
 
-OPCODES_3_3 = OPCODES.copy()
 
-OPCODES_3_4 = OPCODES.copy()
+OPCODES_3_0 = OPCODES_3.copy()
 
-OPCODES_3_5 = OPCODES.copy()
+OPCODES_3_1 = OPCODES_3.copy()
+
+OPCODES_3_2 = OPCODES_3.copy()
+
+OPCODES_3_3 = OPCODES_3.copy()
+
+OPCODES_3_4 = OPCODES_3.copy()
+
+OPCODES_3_5 = OPCODES_3.copy()
 
 # overrrided opcdes in 3.5
 OPCODES_3_5.update({
-    69: 'GET_YIELD_FROM_ITER',
-    81: 'WITH_CLEANUP_START',
+    69: ('GET_YIELD_FROM_ITER', 0),
+    81: ('WITH_CLEANUP_START', 0),
 })
 
 # Removed opcodes in 3.5
@@ -473,13 +496,13 @@ OPCODES_3_5.pop(54)
 
 OPCODES_3_6 = OPCODES_3_5.copy()
 OPCODES_3_6.update({
-    85: 'SETUP_ANNOTATIONS',
-    127: 'STORE_ANNOTATION',
-    142: 'CALL_FUNCTION_EX',
-    155: 'FORMAT_VALUE',
-    156: 'BUILD_CONST_KEY_MAP',
-    157: 'BUILD_STRING',
-    158: 'BUILD_TUPLE_UNPACK_WITH_CALL'
+    85: ('SETUP_ANNOTATIONS', 128),
+    127: ('STORE_ANNOTATION', 128),
+    142: ('CALL_FUNCTION_EX', 128),
+    155: ('FORMAT_VALUE', 128),
+    156: ('BUILD_CONST_KEY_MAP', 128),
+    157: ('BUILD_STRING', 128),
+    158: ('BUILD_TUPLE_UNPACK_WITH_CALL', 128)
 })
 
 # Removed opcodes in 3.6
@@ -487,8 +510,8 @@ OPCODES_3_6.pop(140)
 
 OPCODES_3_7 = OPCODES_3_6.copy()
 OPCODES_3_7.update({
-    160: 'LOAD_METHOD',
-    161: 'CALL_METHOD'
+    160: ('LOAD_METHOD', 128),
+    161: ('CALL_METHOD', 128)
 })
 
 HAS_ARGUMENT = 90  # Opcode > 90 have arguments to deal with

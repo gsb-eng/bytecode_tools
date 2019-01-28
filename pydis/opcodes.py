@@ -1,11 +1,12 @@
 from .constants import (
     CMP_OP, HAS_ARGUMENT, EXTENDED_ARG_NAME, FORMAT_VALUE_NAME,
+    IS_EXTENDED_ARG, IS_MAKE_FUNCTION, IS_FORMAT_VALUE,
     MAKE_FUNCTION_NAME, OPCODES_3_0, OPCODES_3_4, OPCODES_3_5, OPCODES_3_6,
     OPCODES_3_7,
 
     # Opcode flags
-    HAS_COM, HAS_CONST, HAS_FREE, HAS_JREL, HAS_JABS, HAS_LOCAL,
-    HAS_NAME, HAS_NARGS,
+    HAS_CMP, HAS_CONST, HAS_FREE, HAS_JREL, HAS_JABS, HAS_LOCAL,
+    HAS_NAME, HAS_NARGS, HAS_ARG,
 
     # Opcodes classifications
     CMP_OPCODES, CONST_OPCODES, FREE_OPCODES, JREL_OPCODES,
@@ -23,6 +24,7 @@ class Opcode:
     # be defined at class level.
     OPCODE = None
     OPCODE_NAME = None
+    FLAGS = 0
     PYTHON_VERSION = None
 
     def __init__(
@@ -48,55 +50,55 @@ class Opcode:
 
     @classmethod
     def has_const(cls):
-        return cls.OPCODE in CONST_OPCODES
+        return cls.FLAGS & HAS_CONST
 
     @classmethod
     def has_name(cls):
-        return cls.OPCODE in NAME_OPCODES
+        return cls.FLAGS & HAS_NAME
 
     @classmethod
     def has_jrel(cls):
-        return cls.OPCODE in JREL_OPCODES
+        return cls.FLAGS & HAS_JREL
 
     @classmethod
     def has_jabs(cls):
-        return cls.OPCODE in JABS_OPCODES
+        return cls.FLAGS & HAS_JABS
 
     @classmethod
     def has_jump(cls):
-        return cls.OPCODE in (JABS_OPCODES + JREL_OPCODES)
+        return cls.FLAGS & (HAS_JREL | HAS_JABS)
 
     @classmethod
     def has_local(cls):
-        return cls.OPCODE in LOCAL_OPCODES
+        return cls.FLAGS & HAS_LOCAL
 
     @classmethod
     def has_free(cls):
-        return cls.OPCODE in FREE_OPCODES
+        return cls.FLAGS & HAS_FREE
 
     @classmethod
     def has_nargs(cls):
-        return cls.OPCODE in NARGS_OPCODES
+        return cls.FLAGS & HAS_NARGS
 
     @classmethod
     def has_arg(cls):
-        return cls.OPCODE >= HAS_ARGUMENT
+        return cls.FLAGS & HAS_ARG
 
     @classmethod
     def has_cmp(cls):
-        return cls.OPCODE in CMP_OPCODES
+        return cls.FLAGS & HAS_CMP
 
     @classmethod
     def is_extended_arg(cls):
-        return cls.OPCODE_NAME == EXTENDED_ARG_NAME
+        return cls.FLAGS & IS_EXTENDED_ARG
 
     @classmethod
     def is_format_value(cls):
-        return cls.OPCODE_NAME == FORMAT_VALUE_NAME
+        return cls.FLAGS & IS_FORMAT_VALUE
 
     @classmethod
     def is_make_function(cls):
-        return cls.OPCODE_NAME == MAKE_FUNCTION_NAME
+        return cls.FLAGS & IS_MAKE_FUNCTION
 
 
 class OpcodeClassFactory:
@@ -115,14 +117,16 @@ class OpcodeClassFactory:
             'OPCODES_%s_%s' % tuple(str(python_version).split('.')))
 
         globals()['OPCODE_MAPPER'] = ops
-        for op_code, op_name in ops.items():
+        for op_code, op_name_flag in ops.items():
+            op_name, flag = op_name_flag
             op_cls = type(
                 op_name,
                 (Opcode, ),
                 {
                     'OPCODE': op_code,
-                    'OPCODE_NAME': op_nam,
-                    'PYTHON_VERSION': python_version
+                    'OPCODE_NAME': op_name,
+                    'PYTHON_VERSION': python_version,
+                    'FLAGS': flag
                 }
             )
             globals()[op_name] = op_cls
