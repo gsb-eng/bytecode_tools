@@ -17,6 +17,44 @@ from pydis.constants import (
 class _NULL:
     pass
 
+class CodeType:
+
+    def __init__(
+        self,
+        argcount,
+        kwonlyargcount,
+        nlocals,
+        stacksize,
+        flags,
+        code,
+        consts,
+        names,
+        varnames,
+        filename,
+        name,
+        firstlineno,
+        lnotab,
+        freevars,
+        cellvars,
+        python_version=PY_VERSION
+    ):
+        self.co_argcount = argcount
+        if python_version >= 3.0:
+            self.co_kwonlyargcount = kwonlyargcount
+        self.co_nlocals = nlocals
+        self.co_stacksize = stacksize
+        self.co_flags = flags
+        self.co_code = code
+        self.co_consts = consts
+        self.co_names = names
+        self.co_varnames = varnames
+        self.co_filename = filename
+        self.co_name = name
+        self.co_firstlineno = firstlineno
+        self.co_lnotab = lnotab
+        self.co_freevars = freevars
+        self.co_cellvars = cellvars
+
 
 class _Unmarshal:
 
@@ -33,7 +71,7 @@ class _Unmarshal:
         self._read = fp.read
 
         # If no python_version passed, it's the current interpreter version.
-        self.py_version = (
+        self.python_version = (
             python_version if python_version else PY_VERSION
         )
 
@@ -114,9 +152,11 @@ class _Unmarshal:
 
             ORDER MATTERS: They are fixed position bytes.
         """
-
         argcount = self.read_long()
-        kwonlyargcount = self.read_long()
+        if self.python_version >= 3.0:
+            kwonlyargcount = self.read_long()
+        else:
+            kwonlyargcount = 0
         nlocals = self.read_long()
         stacksize = self.read_long()
         flags = self.read_long()
@@ -131,11 +171,12 @@ class _Unmarshal:
         firstlineno = self.read_long()
         lnotab = self._load()
 
-        return types.CodeType(
+        return CodeType(
             argcount, kwonlyargcount, nlocals, stacksize, flags,
             code, consts, names, varnames, filename, name, firstlineno,
             lnotab, freevars, cellvars
         )
+
 
     def load_null(self):
         return _NULL

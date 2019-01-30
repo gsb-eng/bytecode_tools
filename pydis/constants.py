@@ -453,6 +453,7 @@ OPCODES_2_6.update({
 
 OPCODES_2_7 = OPCODES_2_6.copy()
 OPCODES_2_7.update({
+    94: ('LIST_APPEND', 128),
     104: ('BUILD_SET', 128),
     105: ('BUILD_MAP', 128),
     106: ('LOAD_ATTR', 130),
