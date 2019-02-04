@@ -405,7 +405,7 @@ def _try_compile(source, name):
     return c
 
 
-def dis(x=None, *, file=None, depth=None):
+def dis(x=None, file=None, depth=None):
     """Disassemble classes, methods, functions, and other compiled objects.
 
     With no argument, disassemble the last traceback.
@@ -434,12 +434,12 @@ def dis(x=None, *, file=None, depth=None):
         items = sorted(x.__dict__.items())
         for name, x1 in items:
             if isinstance(x1, _have_code):
-                print("Disassembly of %s:" % name, file=file)
+                print("Disassembly of %s:" % name)
                 try:
                     dis(x1, file=file, depth=depth)
                 except TypeError as msg:
-                    print("Sorry:", msg, file=file)
-                print(file=file)
+                    print("Sorry:", msg)
+                print()
     elif hasattr(x, 'co_code'): # Code object
         disassemble_recursive(x, file=file, depth=depth)
     elif isinstance(x, (bytes, bytearray)): # Raw bytecode
@@ -455,7 +455,7 @@ def _disassemble_str(source, **kwargs):
     disassemble_recursive(_try_compile(source, '<dis>'), **kwargs)
 
 
-def distb(tb=None, *, file=None):
+def distb(tb=None, file=None):
     """Disassemble a traceback (default: last traceback).
 
     tb: Traceback can be provided, else it  takes the last traceback.
@@ -464,7 +464,7 @@ def distb(tb=None, *, file=None):
         try:
             tb = sys.last_traceback
         except AttributeError:
-            raise RuntimeError("no last traceback to disassemble") from None
+            raise RuntimeError("no last traceback to disassemble")
         while tb.tb_next: tb = tb.tb_next
 
     # Lats traceback always would be the current version of python, hence no
@@ -484,8 +484,8 @@ def disassemble_recursive(
             depth -= 1
         for obj in code.co_consts:
             if hasattr(obj, 'co_code'):
-                print(file=file)
-                print("Disassembly of %r:" % (code,), file=file)
+                print()
+                print("Disassembly of %r:" % (code,))
                 disassemble_recursive(
                     obj, lasti, python_version, file, depth
                 )

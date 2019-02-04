@@ -2,19 +2,9 @@
 
 """Python version compatibility functions."""
 
-import six
 import sys
 
 from pydis.constants import IS_PY3
-
-
-def bytestring(obj):
-  """Like the builtin str() but always returns a utf-8 encoded bytestring."""
-  out = str(obj)
-  if isinstance(out, six.text_type):
-    return out.encode("utf-8")
-  else:
-    return out
 
 
 def native_str(s):
