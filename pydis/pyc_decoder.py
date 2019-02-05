@@ -29,8 +29,7 @@ def _decode_magic_to_version(magic):
       magic: A 16 bit unsigned little endian encoded byte string
 
     Returns:
-      Python ver
-    """
+p    """
     return MAGIC_NUMBERS[struct.unpack('<H', magic)]
 
 
@@ -85,7 +84,7 @@ def _decode_header(fp):
     magic = _decode_magic(fp)
     ts = _decode_timestamp_bytes(fp, magic)
     size = _decode_size_bytes(fp)
-    return magic, ts, _decode_size_bytes
+    return magic, ts, size
 
 
 def decode_pyc(file_or_bytes):
@@ -114,5 +113,6 @@ def decode_pyc(file_or_bytes):
 
     magic, ts, size = _decode_header(fp)
     code_object = load(fp)
+    fp.close()
 
     return magic, ts, size, code_object

@@ -177,7 +177,6 @@ class _Unmarshal:
             lnotab, freevars, cellvars
         )
 
-
     def load_null(self):
         return _NULL
 
