@@ -517,11 +517,6 @@ OPCODES_3_7.update({
 
 HAS_ARGUMENT = 90  # Opcode > 90 have arguments to deal with
 
-# We don't want the name conflict in opcodes module.
-EXTENDED_ARG_NAME = 'EXTENDED_ARG'
-FORMAT_VALUE_NAME = 'FORMAT_VALUE'
-MAKE_FUNCTION_NAME = 'MAKE_FUNCTION'
-
 # Opcodes with name table lookup required.
 NAME_OPCODES = (
     90, 91, 95, 96, 97, 98, 101, 106, 108, 109, 116, 160
