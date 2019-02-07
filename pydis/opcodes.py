@@ -102,6 +102,8 @@ class Opcode:
 
 class OpcodeClassFactory:
 
+    # These flags are to invalidate if the opcodes are generated in the
+    # same runtime.
     opcodes_generated = False
     opcodes_version = None
 

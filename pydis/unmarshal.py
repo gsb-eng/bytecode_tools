@@ -4,6 +4,7 @@
 
 This implementation is motivated from pypy/lib_pypy/_marshal.py.
 """
+import io
 import struct
 import types
 
@@ -62,13 +63,22 @@ class _Unmarshal:
         self._reflist = []  # Reserve interned objects.
         self._string_reflist = []  # Reserve for loading strings.
 
-    def __call__(self, fp, python_version=None):
+    def __call__(self, fp_or_bytes, python_version=None):
         # File pointer opned in binary mode.
         # One should make sure, if the pyc file is passed the first 8/12 bytes
         # should be read before reaching here. otherwise a bad marshal exception
         # occurs.
-        self.fp = fp
-        self._read = fp.read
+        if not (
+            isinstance(fp_or_bytes, bytes) or
+            isinstance(fp_or_bytes, io.BufferedReader)):
+            raise TypeError('fp_or_bytes should be one of bytes/Bufferedreader')
+
+        if isinstance(fp_or_bytes, bytes):
+            self.fp = io.BytesIO(fp_or_bytes)
+            self._read = self.fp.read
+        else:
+            self.fp = fp_or_bytes
+            self._read = fp.read
 
         # If no python_version passed, it's the current interpreter version.
         self.python_version = (
@@ -412,4 +422,8 @@ class _Unmarshal:
         return interned
 
 
+# Load return the code objecyt.
 load = _Unmarshal()
+
+# loads just return the type of given byte
+loads = load
