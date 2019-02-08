@@ -1,5 +1,6 @@
 
-|  |ci-status|
+.. image:: https://travis-ci.com/gsb-eng/pydis.svg?branch=master
+   :target: https://travis-ci.com/gsb-eng/pydis
 
 PyDis
 =========
@@ -17,8 +18,3 @@ won't support other python versions. If the code object is created through
 Each python version gets changes to opcodes, there will be ne ones added and few
 are deleted. Unless you recreate the code object with new python version, the
 same code object can't be interpreted with old versions.
-
-
-.. |ci-status| image:: https://travis-ci.com/gsb-eng/pydis.svg?branch=master
-    :target: https://travis-ci.com/gsb-eng/pydis
-    :alt: Build status
