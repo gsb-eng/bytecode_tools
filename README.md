@@ -1,7 +1,6 @@
 
-.. image:: https://travis-ci.com/gsb-eng/pydis.svg?branch=master
-   :target: https://travis-ci.com/gsb-eng/pydis
-
+[![Build Status](https://travis-ci.com/gsb-eng/pydis.svg?branch=master)](https://travis-ci.com/gsb-eng/pydis)
+<br />
 PyDis
 =========
 
