@@ -1,3 +1,5 @@
+|  |license| |versions| |status| |ci-status|
+
 PyDis
 =========
 
