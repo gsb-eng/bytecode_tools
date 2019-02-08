@@ -1,4 +1,4 @@
-|  |license| |versions| |status| |ci-status|
+|   |ci-status|
 
 PyDis
 =========
@@ -18,3 +18,6 @@ are deleted. Unless you recreate the code object with new python version, the
 same code object can't be interpreted with old versions.
 
 
+.. |ci-status| image:: https://travis-ci.com/gsb-eng/pydis.svg?branch=master
+    :target: https://travis-ci.com/gsb-eng/pydis
+    :alt: Build status
