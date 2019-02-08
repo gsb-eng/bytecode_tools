@@ -6,4 +6,4 @@ cache: pip
 install:
   - pip install -r requirements_ci.txt
 script:
-  - - bin/tests
+  - bin/tests
