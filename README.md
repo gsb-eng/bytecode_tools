@@ -1,4 +1,5 @@
-|   |ci-status|
+
+|  |ci-status|
 
 PyDis
 =========
