@@ -1,5 +1,4 @@
 #!/bin/bash
 
-
 pytest
-python -m coverage report -m
+coverage report -m
