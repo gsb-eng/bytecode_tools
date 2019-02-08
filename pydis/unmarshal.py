@@ -78,7 +78,7 @@ class _Unmarshal:
             self._read = self.fp.read
         else:
             self.fp = fp_or_bytes
-            self._read = fp.read
+            self._read = self.fp.read
 
         # If no python_version passed, it's the current interpreter version.
         self.python_version = (
@@ -199,7 +199,7 @@ class _Unmarshal:
     def load_true(self):
         return True
 
-    def stopiter(self):
+    def load_stopiter(self):
         return StopIteration
 
     def load_ellipsis(self):
@@ -247,15 +247,14 @@ class _Unmarshal:
         # If is_signed is 1/true, bytes is filled with the 2's-complement
         # representation of v's value.  Bit 0x80 of the MSB is the sign bit.
 
-        b0 = self._read(1)
-        b1 = self._read(1)
-        b2 = self._read(1)
-        b3 = self._read(1)
-        b4 = self._read(1)
-        b5 = self._read(1)
-        b6 = self._read(1)
-        b7 = self._read(1)
-
+        b0 = ord(self._read(1))
+        b1 = ord(self._read(1))
+        b2 = ord(self._read(1))
+        b3 = ord(self._read(1))
+        b4 = ord(self._read(1))
+        b5 = ord(self._read(1))
+        b6 = ord(self._read(1))
+        b7 = ord(self._read(1))
         # Return this if the value is not signed.
         ret_val = (
             b0 | b1 << 8 | b2 << 16 | b3 << 24 |
@@ -268,11 +267,22 @@ class _Unmarshal:
         return ret_val
 
     def load_float(self):
-        size = self._read(1)
-        return float(self._read(int(size)))
+        size = ord(self._read(1))
+        return float(self._read(size))
 
     def load_binary_float(self):
         return struct.unpack('<d', self._read(8))[0]
+
+    def load_complex(self):
+        size = self._read(ord(self._read(1)))
+        real = float(size)
+        size = self._read(ord(self._read(1)))
+        imag = float(size)
+        return complex(real, imag)
+
+    def load_binary_complex(self):
+        binary = self._read(16)
+        return complex(*struct.unpack('dd', binary))
 
     def load_long(self):
         # It lands here if the numeric value is >= 64 bit
@@ -425,5 +435,12 @@ class _Unmarshal:
 # Load return the code objecyt.
 load = _Unmarshal()
 
-# loads just return the type of given byte
-loads = load
+
+def loads(s, python_version=PY_VERSION):
+    """Just return the type of given byte, if more than one byte given then the
+    first will be evaluated and rest ignored.
+    """
+    assert isinstance(s, bytes), 'input string must be bytes'
+    # Take only the first byte, rest ignore
+    # s = io.BytesIO(s).read(1)
+    return load(s, python_version)

@@ -1,0 +1,5 @@
+#!/bin/bash
+
+
+python -m coverage run --strict $@
+python -m coverage report -m
