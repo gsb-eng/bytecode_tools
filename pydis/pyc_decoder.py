@@ -89,7 +89,10 @@ def _decode_header(fp):
     if magic not in MAGIC_NUMBERS:
         raise unknownMagic('Magic number is not valid.')
     ts = _decode_timestamp_bytes(fp, magic)
-    size = _decode_size_bytes(fp)
+
+    size = None
+    if MAGIC_NUMBERS[magic][0] >= 3.0:
+        size = _decode_size_bytes(fp)
     return magic, ts, size
 
 

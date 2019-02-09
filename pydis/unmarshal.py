@@ -353,12 +353,12 @@ class _Unmarshal:
             # Handle Python2 case, the current interpreter is of python3 and
             # handling Python2 generated PYC file. then convert bytes to native
             # str
-            return val
+            return compat.native_str(val)
 
     def load_interned(self):
         # Interned objects are stored as 4*octa --> 32 bits.
         size = self.read_long()
-        val = self._read(size)
+        val = compat.native_str(self._read(size))
         self._string_reflist.append(val)
         return self._mark_ref(val)
 

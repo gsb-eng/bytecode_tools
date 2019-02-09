@@ -24,7 +24,7 @@ PYC_MIME_TYPE = 'application/x-python-code'
 #   Python source code: Lib/importlib/_bootstrap_external.py
 
 V1 = 8
-V2 = 12
+V2 = 8
 V3 = 12
 V4 = 16
 
