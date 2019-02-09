@@ -69,6 +69,7 @@ class _Unmarshal:
         # should be read before reaching here. otherwise a bad marshal exception
         # occurs.
         if not (
+            hasattr(fp_or_bytes, 'read') or
             isinstance(fp_or_bytes, bytes) or
             isinstance(fp_or_bytes, io.BufferedReader)):
             raise TypeError('fp_or_bytes should be one of bytes/Bufferedreader')
@@ -129,7 +130,7 @@ class _Unmarshal:
         Returns:
             The specifix handlers return type.
         """
-        return getattr(self, 'load_{}'.format(code))
+        return getattr(self, 'load_{typ}'.format(typ=code))
 
     def _reserve_reflist(self):
         index = len(self._reflist)
@@ -212,11 +213,10 @@ class _Unmarshal:
         return x
 
     def read_long(self):
-        s = self._read(4)
-        a = s[0]
-        b = s[1]
-        c = s[2]
-        d = s[3]
+        a = ord(self._read(1))
+        b = ord(self._read(1))
+        c = ord(self._read(1))
+        d = ord(self._read(1))
         x = a | (b<<8) | (c<<16) | (d<<24)
         if d & 0x80 and x > 0:
             x = -((1 << 32) - x)
@@ -227,11 +227,7 @@ class _Unmarshal:
     # TODO: handle this with Python2
     # Not required in python3
     def load_int(self):
-        if IS_PY3:
-            return self.read_long()
-        else:
-            # TODO: Handle this when it reaches, PY2 interpreters.
-            pass
+        return self.read_long()
 
     def load_int64(self):
         # PYTHON'S LONG VALUE BYTE ARRAY IS AS BELOW.....as per longobject.h
@@ -357,7 +353,7 @@ class _Unmarshal:
             # Handle Python2 case, the current interpreter is of python3 and
             # handling Python2 generated PYC file. then convert bytes to native
             # str
-            pass
+            return val
 
     def load_interned(self):
         # Interned objects are stored as 4*octa --> 32 bits.

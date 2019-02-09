@@ -14,11 +14,15 @@ from pydis.constants import (
 from pydis.unmarshal import load
 
 
+class UnknowMagic(Exception):
+    pass
+
+
 def __read_unsigned_int(fp):
     return struct.unpack('I', fp.read(4))[0]
 
 
-def _decode_magic_to_version(magic):
+def magic_to_version(magic):
     """To get the magic number from the encoded word.
 
     Magic number is a 16 bit unsigned little endian encoded byte string in the
@@ -82,6 +86,8 @@ def _decode_header(fp):
     happened at 3393 ==> 3.7b1 version.
     """
     magic = _decode_magic(fp)
+    if magic not in MAGIC_NUMBERS:
+        raise unknownMagic('Magic number is not valid.')
     ts = _decode_timestamp_bytes(fp, magic)
     size = _decode_size_bytes(fp)
     return magic, ts, size
@@ -112,7 +118,7 @@ def decode_pyc(file_or_bytes):
         raise ValueError('No resource found with %s' % file_or_bytes)
 
     magic, ts, size = _decode_header(fp)
-    code_object = load(fp)
+    code_object = load(fp, python_version=MAGIC_NUMBERS[magic][0])
     fp.close()
 
     return magic, ts, size, code_object

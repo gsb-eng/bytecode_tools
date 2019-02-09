@@ -17,7 +17,7 @@ from .constants import (
 MAKE_FUNCTION_FLAGS = ('defaults', 'kwdefaults', 'annotations', 'closure')
 
 
-class Opcode:
+class Opcode(object):
 
     # Op code and name are fixed for a given instruction type, hence they would
     # be defined at class level.
@@ -100,7 +100,7 @@ class Opcode:
         return cls.FLAGS & IS_MAKE_FUNCTION
 
 
-class OpcodeClassFactory:
+class OpcodeClassFactory(object):
 
     # These flags are to invalidate if the opcodes are generated in the
     # same runtime.

@@ -29,8 +29,6 @@ class DecodeCodeObject:
 
         self.code_object = code_object
         self.code = code_object.co_code
-        assert isinstance(self.code, bytes)
-
         self.constants = code_object.co_consts
         self.names = code_object.co_names
         self.varnames = code_object.co_varnames
@@ -119,7 +117,7 @@ class DecodeCodeObject:
                                instr.line is not None and
                                instr.offset > 0)
             if new_source_line:
-                print()
+                print('')
             is_current_instr = instr.offset == self.last_instruction
             print(
                 self._disassemble(instr, lineno_width, is_current_instr, offset_width)
@@ -250,6 +248,10 @@ class DecodeCodeObject:
         for byte_incr, line_incr in zip(byte_increments, line_increments):
             # No byte increment means, it's helping instruction for satsifying
             # line increment signed byte range as explained above.
+            byte_incr = (
+                ord(byte_incr) if isinstance(byte_incr, str) else byte_incr)
+            line_incr = (
+                ord(line_incr) if isinstance(line_incr, str) else line_incr)
             if byte_incr:
 
                 # If current line and last line numbers match, this means that it's
@@ -348,7 +350,9 @@ class DecodeCodeObject:
 
         while pos < size:
             arg = None
-            op_code = getattr(opcodes, opcodes.OPCODE_MAPPER[self.code[pos]][0])
+            op_code = getattr(
+                opcodes, opcodes.OPCODE_MAPPER[self._code_index_val(pos)][0]
+            )
             if op_code.has_arg():
                 factor = 0
                 if op_code.is_extended_arg():
@@ -356,8 +360,8 @@ class DecodeCodeObject:
                     factor = 2
 
                 temp_arg = (
-                    self.code[pos+1] << (8 * factor) |
-                    self.code[pos+2] << (8 * (factor + 1))
+                    self._code_index_val(pos+1) << (8 * factor) |
+                    self._code_index_val(pos+2) << (8 * (factor + 1))
                 )
                 if factor:
                     extended_arg = temp_arg
@@ -378,13 +382,21 @@ class DecodeCodeObject:
             offset = pos + bytes_read
             pos += bytes_read
 
+    def _code_index_val(self, i):
+        if isinstance(self.code[i], str):
+            return ord(self.code[i])
+        else:
+            return self.code[i]
+
     def _unpack_wordcode(self):
         extended_arg = 0
         for i in range(0, len(self.code), 2):
-
-            op_code = getattr(opcodes, opcodes.OPCODE_MAPPER[self.code[i]][0])
+            print(self.code[i])
+            op_code = getattr(
+                opcodes, opcodes.OPCODE_MAPPER[self._code_index_val(i)][0]
+            )
             if op_code.has_arg():
-                arg = self.code[i + 1] | extended_arg
+                arg = self._code_index_val(i + 1) | extended_arg
                 extended_arg = arg << 8 if op_code.is_extended_arg() else 0
             else:
                 arg = None
@@ -439,7 +451,7 @@ def dis(x=None, file=None, depth=None):
                     dis(x1, file=file, depth=depth)
                 except TypeError as msg:
                     print("Sorry:", msg)
-                print()
+                print('')
     elif hasattr(x, 'co_code'): # Code object
         disassemble_recursive(x, file=file, depth=depth)
     elif isinstance(x, (bytes, bytearray)): # Raw bytecode
