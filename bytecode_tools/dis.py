@@ -391,7 +391,6 @@ class DecodeCodeObject:
     def _unpack_wordcode(self):
         extended_arg = 0
         for i in range(0, len(self.code), 2):
-            print(self.code[i])
             op_code = getattr(
                 opcodes, opcodes.OPCODE_MAPPER[self._code_index_val(i)][0]
             )

@@ -296,7 +296,7 @@ class _Unmarshal:
         #
         # Certainly this is because, the INT in python is signed and it ranges
         # from -32768 to 32767 -->. -2**15 to 2**15 - 1. So this would help
-        # poratbility to python native int.
+        # portability to python native int.
         #
         # I.e: n = 14273427342342384723428347234
         #
@@ -338,7 +338,7 @@ class _Unmarshal:
         digit_size = self.read_long()
         sign = -1 if digit_size < 0 else 1
         x = 0
-        for i in range(digit_size):
+        for i in range(abs(digit_size)):
             d = self.r_short()
             x = x | (d<<(i*15))
         return x * sign
