@@ -8,10 +8,10 @@ This is more relavent to/used some portions of Cpython's Lib/dis.py.
 """
 import sys
 
-from pydis.constants import PY_VERSION
-from pydis.unmarshal import load
+from bytecode_tools.constants import PY_VERSION
+from bytecode_tools.unmarshal import load
 
-from pydis import opcodes
+from bytecode_tools import opcodes
 
 # These are fixed as per lib/dis.py
 _OPNAME_WIDTH = 20

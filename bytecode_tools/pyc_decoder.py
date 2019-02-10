@@ -8,10 +8,10 @@ import mimetypes
 import os
 import struct
 
-from pydis.constants import (
+from bytecode_tools.constants import (
     IS_PY3, MAGIC_NUMBERS, PYC_MIME_TYPE, V3, V4
 )
-from pydis.unmarshal import load
+from bytecode_tools.unmarshal import load
 
 
 class UnknowMagic(Exception):

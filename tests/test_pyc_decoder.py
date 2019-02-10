@@ -2,8 +2,8 @@
 import os
 import unittest
 
-from pydis.pyc_decoder import decode_pyc
-from pydis.unmarshal import CodeType
+from bytecode_tools.pyc_decoder import decode_pyc
+from bytecode_tools.unmarshal import CodeType
 
 
 class TestPycDecoder(unittest.TestCase):

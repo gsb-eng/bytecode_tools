@@ -1,9 +1,9 @@
 from setuptools import find_packages, setup
 
 
-setup(name='pydis',
+setup(name='bytecode_tools',
       version='0.1',
-      description='Python disassembler.',
+      description='Python Bytecode tools.',
       url='',
       author='Srinivas Garlapati',
       author_email='gsb@gsb-eng.com',
