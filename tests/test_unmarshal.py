@@ -1,5 +1,6 @@
 
 import os
+import sys
 import unittest
 
 from bytecode_tools.unmarshal import load, loads, CodeType
@@ -42,8 +43,12 @@ class TestPycDecoder(unittest.TestCase):
             loads(b'I\xff\xff\xff\xff\xff\xff\xff\0'), 72057594037927935)
 
     def test_load_long(self):
-        self.assertEqual(loads(b'l\7\0\0\0\ud620\u3bdf\u7b83\u5a46\u3cea\u43d6\ub000'), 14273427342342384723428347234)
-        self.assertEqual(loads(b'l\xf9\xff\xff\xff\0\0\4\0\2\0\5\0'), 175924008058880)
+        self.assertEqual(
+            loads(b'l\x07\x00\x00\x00b\r\xdf;\x83{FZ\xea<\xd6C\x0b\x00'),
+            14273427342342384723428347234)
+        self.assertEqual(
+            loads(b'l\xf9\xff\xff\xffb\r\xdf;\x83{FZ\xea<\xd6C\x0b\x00'),
+            -14273427342342384723428347234)
 
     def test_load_complex(self):
         self.assertEqual(loads(b'x\2.1\6.12345'), 0.1+0.12345j)
@@ -52,7 +57,61 @@ class TestPycDecoder(unittest.TestCase):
         self.assertEqual(
             loads(b'y\0\0\0\0\0\0\xf8\x3f\0\0\0\0\0\0\xe0\xbf'), 1.5+-0.5j)
 
+    def test_load_string(self):
+        assert loads(b's\5\0\0\0hello', 2.6) == 'hello'
+        assert loads(b's\5\0\0\0hello', 2.7) == 'hello'
+        assert loads(b's\5\0\0\0hello', 3.4) == b'hello'
+        assert loads(b's\5\0\0\0hello', 3.5) == b'hello'
+        assert loads(b's\5\0\0\0hello', 3.6) == b'hello'
+        assert (loads(b's\5\0\0\0hello', 3.7) == b'hello')
 
+    def test_load_interned(self):
+        assert loads(b't\5\0\0\0hello', 2.6) == 'hello'
+        assert loads(b't\5\0\0\0hello', 2.7) == 'hello'
+        assert loads(b't\5\0\0\0hello', 3.4) == 'hello'
+        assert loads(b't\5\0\0\0hello', 3.5) == 'hello'
+        assert loads(b't\5\0\0\0hello', 3.6) == 'hello'
+        assert loads(b't\5\0\0\0hello', 3.7) == 'hello'
+
+    def test_load_stringref(self):
+        self.assertEqual(
+            loads(b'(\2\0\0\0t\5\0\0\0helloR\0\0\0\0'), ('hello', 'hello'))
+        self.assertEqual(
+            loads(b'(\3\0\0\0t\5\0\0\0hellot\5\0\0\0worldR\1\0\0\0'),
+            ('hello', 'world', 'world'))
+
+    def test_load_tuple(self):
+        self.assertEqual(loads(b'(\2\0\0\0i\1\0\0\0i\2\0\0\0'), (1, 2))
+
+    def test_load_list(self):
+        self.assertEqual(
+            loads(b'[\3\0\0\0i\1\0\0\0i\2\0\0\0i\3\0\0\0'), [1, 2, 3])
+
+    def test_load_dict(self):
+        self.assertEqual(
+            loads(b'{i\1\0\0\0i\2\0\0\0i\3\0\0\0i\4\0\0\0N'), {1: 2, 3: 4})
+
+    def test_load_small_tuple(self):
+        self.assertEqual(loads(b')\2i\1\0\0\0i\2\0\0\0'), (1, 2))
+
+    def test_load_set(self):
+        self.assertEqual(
+            loads(b'<\3\0\0\0i\1\0\0\0i\2\0\0\0i\3\0\0\0'), set([1, 2, 3]))
+
+    def test_load_frozenset(self):
+        self.assertEqual(
+            loads(b'>\3\0\0\0i\1\0\0\0i\2\0\0\0i\3\0\0\0'), frozenset([1, 2, 3]))
+
+    def test_load_unicode(self):
+        self.assertEqual(loads(b'u\3\0\0\0abc'), 'abc')
+
+        if sys.version_info[0] == 2:
+            self.assertEqual(loads(b'u\3\0\0\0a\xc3\xa5'), u'a\xe5')
+        else:
+            self.assertEqual(loads(b'u\3\0\0\0a\xc3\xa5'), 'a\xe5')
+
+    def load_ref(self):
+        self.assertEqual(loads(b'u\3\0\0\0abc'), 'abc')
 
 
 if __name__ == '__main__':

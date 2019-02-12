@@ -59,15 +59,18 @@ class CodeType:
 
 class _Unmarshal:
 
-    def __init__(self):
-        self._reflist = []  # Reserve interned objects.
-        self._string_reflist = []  # Reserve for loading strings.
+    # def __init__(self, fp_or_bytes, python_version=None):
+    #     self._reflist = []  # Reserve interned objects.
+    #     self._string_reflist = []  # Reserve for loading strings.
 
     def __call__(self, fp_or_bytes, python_version=None):
         # File pointer opned in binary mode.
         # One should make sure, if the pyc file is passed the first 8/12 bytes
         # should be read before reaching here. otherwise a bad marshal exception
         # occurs.
+        self._reflist = []  # Reserve interned objects.
+        self._string_reflist = []  # Reserve for loading strings.
+
         if not (
             hasattr(fp_or_bytes, 'read') or
             isinstance(fp_or_bytes, bytes) or
@@ -346,8 +349,7 @@ class _Unmarshal:
     def load_string(self):
         size = self.read_long()
         val = self._read(size)
-
-        if IS_PY3:
+        if self.python_version >= 3:
             return compat.BytesType(val)
         else:
             # Handle Python2 case, the current interpreter is of python3 and
@@ -429,7 +431,8 @@ class _Unmarshal:
 
 
 # Load return the code objecyt.
-load = _Unmarshal()
+def load(s, python_version=PY_VERSION):
+    return _Unmarshal()(s, python_version)
 
 
 def loads(s, python_version=PY_VERSION):
@@ -439,4 +442,4 @@ def loads(s, python_version=PY_VERSION):
     assert isinstance(s, bytes), 'input string must be bytes'
     # Take only the first byte, rest ignore
     # s = io.BytesIO(s).read(1)
-    return load(s, python_version)
+    return _Unmarshal()(s, python_version)
