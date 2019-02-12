@@ -1,5 +1,5 @@
 
-[![Build Status](https://travis-ci.com/gsb-eng/pydis.svg?branch=master)](https://travis-ci.com/gsb-eng/pydis)
+[![Build Status](https://travis-ci.com/gsb-eng/byecode_tools.svg?branch=master)](https://travis-ci.com/gsb-eng/bytecode_tools)
 <br />
 <br />
 PyDis
