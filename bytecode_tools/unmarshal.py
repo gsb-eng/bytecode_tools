@@ -59,10 +59,6 @@ class CodeType:
 
 class _Unmarshal:
 
-    # def __init__(self, fp_or_bytes, python_version=None):
-    #     self._reflist = []  # Reserve interned objects.
-    #     self._string_reflist = []  # Reserve for loading strings.
-
     def __call__(self, fp_or_bytes, python_version=None):
         # File pointer opned in binary mode.
         # One should make sure, if the pyc file is passed the first 8/12 bytes

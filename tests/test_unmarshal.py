@@ -75,10 +75,10 @@ class TestPycDecoder(unittest.TestCase):
 
     def test_load_stringref(self):
         self.assertEqual(
-            loads(b'(\2\0\0\0t\5\0\0\0helloR\0\0\0\0'), ('hello', 'hello'))
+            loads(b'[\2\0\0\0t\5\0\0\0helloR\0\0\0\0'), ['hello', 'hello'])
         self.assertEqual(
-            loads(b'(\3\0\0\0t\5\0\0\0hellot\5\0\0\0worldR\1\0\0\0'),
-            ('hello', 'world', 'world'))
+            loads(b'[\3\0\0\0t\5\0\0\0hellot\5\0\0\0worldR\1\0\0\0'),
+            ['hello', 'world', 'world'])
 
     def test_load_tuple(self):
         self.assertEqual(loads(b'(\2\0\0\0i\1\0\0\0i\2\0\0\0'), (1, 2))
