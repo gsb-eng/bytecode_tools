@@ -4,14 +4,14 @@
 
 import sys
 
-from bytecode_tools.constants import IS_PY3
+from bytecode_tools.constants import IS_PY2, IS_PY3
 
 
 def native_str(s):
   """Convert a bytes or unicode object to the native str type."""
   if isinstance(s, str):
     return s
-  elif sys.version_info[0] < 3:
+  elif IS_PY2:
     return s.encode("utf-8")
   else:
     return s.decode("utf-8")

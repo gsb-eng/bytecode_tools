@@ -136,10 +136,6 @@ class _Unmarshal:
         self._reflist.append(None)
         return index
 
-    def _mark_ref(self, val):
-        self._reflist.append(val)
-        return val
-
     def load_code(self):
         """
         Here is the order of flags loaded on marshal.c
@@ -358,7 +354,7 @@ class _Unmarshal:
         size = self.read_long()
         val = compat.native_str(self._read(size))
         self._string_reflist.append(val)
-        return self._mark_ref(val)
+        return val
 
     def load_stringref(self):
         index = self.read_long()
@@ -410,7 +406,7 @@ class _Unmarshal:
         return compat.native_str(self._read(size))
 
     def load_ascii_interned(self):
-        size = self._read_byte()
+        size = self.read_long()
         interned_ascii = compat.native_str(self._read(size))
         self._string_reflist.append(interned_ascii)
         return interned_ascii

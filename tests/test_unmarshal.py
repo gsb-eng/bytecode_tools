@@ -3,8 +3,10 @@ import os
 import sys
 import unittest
 
+from bytecode_tools.constants import IS_PY2
 from bytecode_tools.unmarshal import load, loads, CodeType
 from bytecode_tools.unmarshal import CodeType
+
 
 
 class TestPycDecoder(unittest.TestCase):
@@ -14,6 +16,11 @@ class TestPycDecoder(unittest.TestCase):
         self.pyc_dir = os.path.join(self.base_dir, 'pyc_files')
         self.pyc36 = os.path.join(self.pyc_dir, 'test.cpython-36.pyc')
         self.pyc37 = os.path.join(self.pyc_dir, 'test.cpython-37.pyc')
+
+    def test_bad_code(self):
+        with self.assertRaises(ValueError):
+            loads(b'$')
+            loads(b'1223')
 
     def test_loads(self):
         self.assertEqual(loads(b'N'), None)
@@ -105,13 +112,29 @@ class TestPycDecoder(unittest.TestCase):
     def test_load_unicode(self):
         self.assertEqual(loads(b'u\3\0\0\0abc'), 'abc')
 
-        if sys.version_info[0] == 2:
+        if IS_PY2:
             self.assertEqual(loads(b'u\3\0\0\0a\xc3\xa5'), u'a\xe5')
         else:
             self.assertEqual(loads(b'u\3\0\0\0a\xc3\xa5'), 'a\xe5')
 
-    def load_ref(self):
-        self.assertEqual(loads(b'u\3\0\0\0abc'), 'abc')
+    def test_load_ref(self):
+        self.assertEqual(loads(b'(\2\0\0\0\xe9\1\0\0\0r\0\0\0\0'), (1, 1))
+
+    def test_load_ascii(self):
+        self.assertEqual(loads(b'a\2\0\0\0ab'), 'ab')
+        self.assertEqual(loads(b'a\5\0\0\0aaaaa'), 'a'*5)
+
+    def test_load_ascii_interned(self):
+        self.assertEqual(loads(b'A\2\0\0\0ab'), 'ab')
+        self.assertEqual(loads(b'A\5\0\0\0aaaaa'), 'a'*5)
+
+    def test_load_short_ascii(self):
+        self.assertEqual(loads(b'z\2ab'), 'ab')
+        self.assertEqual(loads(b'z\5aaaaa'), 'a'*5)
+
+    def test_load_short_ascii_interned(self):
+        self.assertEqual(loads(b'Z\2ab'), 'ab')
+        self.assertEqual(loads(b'Z\5aaaaa'), 'a'*5)
 
 
 if __name__ == '__main__':
