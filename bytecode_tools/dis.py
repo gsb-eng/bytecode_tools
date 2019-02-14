@@ -299,19 +299,16 @@ class DecodeCodeObject:
 
     def unpack_code(self):
 
-        # import pdb;pdb.set_trace()
         self.labels = self.findlabels(unpacked_code=self.reader())
         self.linestarts = dict(self.line_no_table())
 
-        lis = []
-
+        instruction_list = []
         for offset, end, op_code, arg in self.reader():
-
             argval = None
             argrepr = ''
             line_start = self.linestarts.get(offset, None)
             is_jump_target = offset in self.labels
-            if arg:
+            if not arg is None:
                 argval = arg
                 if op_code.has_const():
                     argval, argrepr = self._get_const_info(arg)
@@ -330,7 +327,7 @@ class DecodeCodeObject:
                         if arg & (1<<i)
                     )
 
-            lis.append(op_code(
+            instruction_list.append(op_code(
                 offset,
                 end,
                 line_start,
@@ -339,7 +336,7 @@ class DecodeCodeObject:
                 argrepr,
                 is_jump_target
             ))
-        return lis
+        return instruction_list
 
     def _unpack_bytecode(self):
         # Unlike wordcode, bytecode doesn't have fixed 16 byte words.
@@ -453,10 +450,10 @@ def dis(x=None, file=None, depth=None):
                 print('')
     elif hasattr(x, 'co_code'): # Code object
         disassemble_recursive(x, file=file, depth=depth)
-    elif isinstance(x, (bytes, bytearray)): # Raw bytecode
-        disassemble(x, file=file)
     elif isinstance(x, str):    # Source code
         _disassemble_str(x, file=file, depth=depth)
+    elif isinstance(x, (bytes, bytearray)): # Raw bytecode
+        disassemble(x, file=file)
     else:
         raise TypeError("don't know how to disassemble %s objects" %
                         type(x).__name__)
