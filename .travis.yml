@@ -9,3 +9,5 @@ install:
   - pip install -r requirements_ci.txt
 script:
   - bin/tests
+after_success:
+  - codecov
