@@ -1,8 +1,8 @@
 
 [![Build Status](https://travis-ci.com/gsb-eng/bytecode_tools.svg?branch=master)](https://travis-ci.com/gsb-eng/bytecode_tools)
 [![Coverage Status](https://img.shields.io/codecov/c/github/gsb-eng/bytecode_tools/master.svg)](https://codecov.io/github/gsb-eng/bytecode_tools?branch=master)
-
 <br />
+
 PyDis
 =========
 
