@@ -55,6 +55,7 @@ class CodeType:
         self.co_lnotab = lnotab
         self.co_freevars = freevars
         self.co_cellvars = cellvars
+        self.python_version = python_version
 
 
 class _Unmarshal:
@@ -180,7 +181,7 @@ class _Unmarshal:
         return CodeType(
             argcount, kwonlyargcount, nlocals, stacksize, flags,
             code, consts, names, varnames, filename, name, firstlineno,
-            lnotab, freevars, cellvars
+            lnotab, freevars, cellvars, self.python_version
         )
 
     def load_null(self):
