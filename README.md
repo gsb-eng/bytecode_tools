@@ -3,6 +3,14 @@
 [![Coverage Status](https://img.shields.io/codecov/c/github/gsb-eng/bytecode_tools/master.svg)](https://codecov.io/github/gsb-eng/bytecode_tools?branch=master)
 <br />
 
+Bytecode Tools
+===============
+
+Bytecode tools are combination of multiple necessary modules to play with Python
+bytecode.
+
+Right now it has `pydis`.
+
 PyDis
 =========
 
