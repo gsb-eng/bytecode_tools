@@ -2,16 +2,18 @@ language: python
 dist: xenial
 sudo: false
 python:
-  - "2.6"
   - "2.7"
   - "3.4"
   - "3.5"
   - "3.6"
   - "3.7"
-cache: pip
-install:
-  - pip install -r requirements_ci.txt
-script:
-  - bin/tests
+
+jobs:
+  include:
+    - dist: trusty
+      python: 2.6
+      install: pip install -r requirements_ci.txt
+      script: bin/tests
+
 after_success:
   - codecov
