@@ -326,6 +326,9 @@ class DecodeCodeObject:
                         s for i, s in enumerate(opcodes.MAKE_FUNCTION_FLAGS)
                         if arg & (1<<i)
                     )
+                elif op_code.has_jrel():
+                    argval = arg
+                    argrepr = "to {val}".format(val=offset + arg + 2)
 
             instruction_list.append(op_code(
                 offset,

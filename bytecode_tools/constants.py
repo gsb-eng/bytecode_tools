@@ -299,7 +299,7 @@ OPCODES_3 = {
     116: ('LOAD_GLOBAL', 130),
     119: ('CONTINUE_LOOP', 128),
     120: ('SETUP_LOOP', 128),
-    121: ('SETUP_EXCEPT', 128),
+    121: ('SETUP_EXCEPT', 132),
     122: ('SETUP_FINALLY', 132),
     124: ('LOAD_FAST', 144),
     125: ('STORE_FAST', 144),
@@ -529,7 +529,7 @@ NAME_OPCODES = (
 JREL_OPCODES = (93, 110, 122, 143, 154, 162)
 
 # Opcodes with absolute jimp
-JABS_OPCODES = (111, 112, 113, 114, 115)
+JABS_OPCODES = (111, 112, 113, 114, 115, 121)
 
 # Opcodes with constants.
 CONST_OPCODES = (100,)
