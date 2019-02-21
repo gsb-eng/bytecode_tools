@@ -111,7 +111,7 @@ class OpcodeClassFactory(object):
     # same runtime.
     opcodes_generated = False
     opcodes_version = None
-    opcode_register = []
+    opcodes_register = []
 
     @classmethod
     def gen_opcode_classes(cls, python_version=PY_VERSION):
@@ -120,9 +120,9 @@ class OpcodeClassFactory(object):
             return 403
 
         # remove if any opcodes already generated exist
-        for i in cls.opcode_register:
+        for i in cls.opcodes_register:
             globals().pop(i)
-        cls.opcode_register = []
+        cls.opcodes_register = []
         # If no version passed, then consider default python 3 opcodes.
         ops = globals().get(
             'OPCODES_%s_%s' % tuple(str(python_version).split('.')))
@@ -141,7 +141,7 @@ class OpcodeClassFactory(object):
                 }
             )
             globals()[op_name] = op_cls
-            cls.opcode_register.append(op_name)
+            cls.opcodes_register.append(op_name)
 
         cls.opcodes_generated = True
         cls.opcodes_version = python_version

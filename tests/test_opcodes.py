@@ -71,7 +71,7 @@ class TestPycDecoder(unittest.TestCase):
 
     def test_opcode_class_factory_37(self):
         opcodes.OpcodeClassFactory.gen_opcode_classes(3.7)
-        self.assertEqual(len(opcodes.OpcodeClassFactory.opcode_register), 121)
+        self.assertEqual(len(opcodes.OpcodeClassFactory.opcodes_register), 121)
 
         # Do not generate if opcodes are already generated
         ret = opcodes.OpcodeClassFactory.gen_opcode_classes(3.7)
@@ -79,19 +79,19 @@ class TestPycDecoder(unittest.TestCase):
 
     def test_opcode_class_factory_36(self):
         opcodes.OpcodeClassFactory.gen_opcode_classes(3.6)
-        self.assertEqual(len(opcodes.OpcodeClassFactory.opcode_register), 121)
+        self.assertEqual(len(opcodes.OpcodeClassFactory.opcodes_register), 121)
 
     def test_opcode_class_factory_35(self):
         opcodes.OpcodeClassFactory.gen_opcode_classes(3.5)
-        self.assertEqual(len(opcodes.OpcodeClassFactory.opcode_register), 116)
+        self.assertEqual(len(opcodes.OpcodeClassFactory.opcodes_register), 116)
 
     def test_opcode_class_factory_34(self):
         opcodes.OpcodeClassFactory.gen_opcode_classes(3.4)
-        self.assertEqual(len(opcodes.OpcodeClassFactory.opcode_register), 117)
+        self.assertEqual(len(opcodes.OpcodeClassFactory.opcodes_register), 117)
 
     def test_opcode_class_factory_27(self):
         opcodes.OpcodeClassFactory.gen_opcode_classes(2.7)
-        self.assertEqual(len(opcodes.OpcodeClassFactory.opcode_register), 119)
+        self.assertEqual(len(opcodes.OpcodeClassFactory.opcodes_register), 119)
 
         # Do not generate if opcodes are already generated
         ret = opcodes.OpcodeClassFactory.gen_opcode_classes(2.7)
@@ -99,7 +99,7 @@ class TestPycDecoder(unittest.TestCase):
 
     def test_opcode_extended_arg_37(self):
         opcodes.OpcodeClassFactory.gen_opcode_classes(3.7)
-        self.assertEqual(len(opcodes.OpcodeClassFactory.opcode_register), 121)
+        self.assertEqual(len(opcodes.OpcodeClassFactory.opcodes_register), 121)
 
         # Do not generate if opcodes are already generated
         self.assertEqual(opcodes.EXTENDED_ARG.OPCODE, 144)
@@ -108,7 +108,7 @@ class TestPycDecoder(unittest.TestCase):
 
     def test_opcode_extended_arg_27(self):
         opcodes.OpcodeClassFactory.gen_opcode_classes(2.7)
-        self.assertEqual(len(opcodes.OpcodeClassFactory.opcode_register), 119)
+        self.assertEqual(len(opcodes.OpcodeClassFactory.opcodes_register), 119)
 
         # Do not generate if opcodes are already generated
         self.assertEqual(opcodes.EXTENDED_ARG.OPCODE, 145)
@@ -117,7 +117,7 @@ class TestPycDecoder(unittest.TestCase):
 
     def test_opcode_extended_arg_26(self):
         opcodes.OpcodeClassFactory.gen_opcode_classes(2.6)
-        self.assertEqual(len(opcodes.OpcodeClassFactory.opcode_register), 113)
+        self.assertEqual(len(opcodes.OpcodeClassFactory.opcodes_register), 113)
 
         # Do not generate if opcodes are already generated
         self.assertEqual(opcodes.EXTENDED_ARG.OPCODE, 143)
