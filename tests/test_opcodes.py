@@ -75,7 +75,7 @@ class TestPycDecoder(unittest.TestCase):
 
         # Do not generate if opcodes are already generated
         ret = opcodes.OpcodeClassFactory.gen_opcode_classes(3.7)
-        self.assertEqual(ret, 200)
+        self.assertEqual(ret, 403)
 
     def test_opcode_class_factory_36(self):
         opcodes.OpcodeClassFactory.gen_opcode_classes(3.6)
@@ -95,7 +95,7 @@ class TestPycDecoder(unittest.TestCase):
 
         # Do not generate if opcodes are already generated
         ret = opcodes.OpcodeClassFactory.gen_opcode_classes(2.7)
-        self.assertEqual(ret, 200)
+        self.assertEqual(ret, 403)
 
     def test_opcode_extended_arg_37(self):
         opcodes.OpcodeClassFactory.gen_opcode_classes(3.7)

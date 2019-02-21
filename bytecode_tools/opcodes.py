@@ -1,5 +1,8 @@
 # Copyright (c) 2018-2019 by Srinivas Garlapati
 
+# pylint: disable= C0111, W0611, R0205, R0913, R0903
+
+
 from .constants import (
     CMP_OP, HAS_ARGUMENT, IS_EXTENDED_ARG, IS_MAKE_FUNCTION, IS_FORMAT_VALUE,
     OPCODES_2_5, OPCODES_2_6, OPCODES_2_7, OPCODES_3_0, OPCODES_3_4,
@@ -20,7 +23,7 @@ MAKE_FUNCTION_FLAGS = ('defaults', 'kwdefaults', 'annotations', 'closure')
 
 
 class Opcode(object):
-
+    """Base opcode definition"""
     # Op code and name are fixed for a given instruction type, hence they would
     # be defined at class level.
     OPCODE = None
@@ -29,14 +32,14 @@ class Opcode(object):
     PYTHON_VERSION = None
 
     def __init__(
-        self,
-        offset,
-        end,
-        line,
-        arg,
-        arg_val,
-        arg_repr,
-        is_jump_target):
+            self,
+            offset,
+            end,
+            line,
+            arg,
+            arg_val,
+            arg_repr,
+            is_jump_target):
 
         self.offset = offset
         self.end = end
@@ -114,7 +117,7 @@ class OpcodeClassFactory(object):
     def gen_opcode_classes(cls, python_version=PY_VERSION):
         # If they are already generated, then no need to do it again.
         if cls.opcodes_generated and cls.opcodes_version == python_version:
-            return 200
+            return 403
 
         # remove if any opcodes already generated exist
         for i in cls.opcode_register:
@@ -142,3 +145,4 @@ class OpcodeClassFactory(object):
 
         cls.opcodes_generated = True
         cls.opcodes_version = python_version
+        return 200
