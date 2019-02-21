@@ -1,3 +1,5 @@
+# Copyright (c) 2018-2019 by Srinivas Garlapati
+
 from .constants import (
     CMP_OP, HAS_ARGUMENT, IS_EXTENDED_ARG, IS_MAKE_FUNCTION, IS_FORMAT_VALUE,
     OPCODES_2_5, OPCODES_2_6, OPCODES_2_7, OPCODES_3_0, OPCODES_3_4,

@@ -1,31 +1,37 @@
-# Copyright (c) 2018 by Srinivas Garlapati
+# Copyright (c) 2018-2019 by Srinivas Garlapati
 
 """Disassemble the code object, it would be in multiple ways. Show the
 disassembled instructions or return the sequence of instructions from the
 bytecode sequence.
 
-This is more relavent to/used some portions of Cpython's Lib/dis.py.
-"""
-import sys
+This is more relavent to/used some portions of Cpython's Lib/dis.py
 
-from bytecode_tools.constants import PY_VERSION
-from bytecode_tools.unmarshal import load
+
+"""
+# pylint: disable=E1101, R0902, C0103, R0912
+
+import sys
+import types
 
 from bytecode_tools import opcodes
+from bytecode_tools.constants import PY_VERSION
 
-# These are fixed as per lib/dis.py
+
+# These are fixed as per Cpython's Lib/dis.py
 _OPNAME_WIDTH = 20
 _OPARG_WIDTH = 5
 
+_have_code = (types.MethodType, types.FunctionType, types.CodeType,
+              classmethod, staticmethod, type)
 
 class DecodeCodeObject:
-
+    """Decode code object"""
     def __init__(
-        self,
-        code_object,
-        last_instruction=-1,
-        python_version=None,
-        file=None):
+            self,
+            code_object,
+            last_instruction=-1,
+            python_version=None,
+            file=None):
 
         self.code_object = code_object
         self.code = code_object.co_code
@@ -33,6 +39,7 @@ class DecodeCodeObject:
         self.names = code_object.co_names
         self.varnames = code_object.co_varnames
         self.freevars = code_object.co_cellvars + code_object.co_freevars
+        self.file = file
 
         # If no python version passed then, the current interpreter verion
         # will be used.
@@ -51,12 +58,12 @@ class DecodeCodeObject:
             else self._unpack_bytecode
         )
 
+    @staticmethod
     def _disassemble(
-        self,
-        instruction,
-        lineno_width=3,
-        mark_as_current=False,
-        offset_width=4):
+            instruction,
+            lineno_width=3,
+            mark_as_current=False,
+            offset_width=4):
         """Format instruction details for inclusion in disassembly output
 
         *lineno_width* sets the width of the line number field (0 omits it)
@@ -94,6 +101,7 @@ class DecodeCodeObject:
         return ' '.join(fields).rstrip()
 
     def disassemble(self, line_offset=0):
+        """Disassembler"""
         # Omit the line number column entirely if we have no line number info
 
         unpacked_code = self.unpack_code()
@@ -135,7 +143,8 @@ class DecodeCodeObject:
             argval = self.constants[const_index]
         return argval, repr(argval)
 
-    def _get_name_info(self, name_index, name_list):
+    @staticmethod
+    def _get_name_info(name_index, name_list):
         """Helper to get optional details about named references
 
            Returns the dereferenced name as both value and repr if the name
@@ -280,11 +289,12 @@ class DecodeCodeObject:
             yield(addr, lineno)
 
     def findlabels(self, unpacked_code=None):
+        """Jump target label finder."""
         labels = []
         if unpacked_code is None:
             unpacked_code = self.reader()
 
-        for offset, end, op_code, arg in unpacked_code:
+        for offset, _, op_code, arg in unpacked_code:
             if arg:
                 if op_code.has_jrel():
                     target = offset + 2 + arg
@@ -298,7 +308,7 @@ class DecodeCodeObject:
         return labels
 
     def unpack_code(self):
-
+        """Unpack the bytecode"""
         self.labels = self.findlabels(unpacked_code=self.reader())
         self.linestarts = dict(self.line_no_table())
 
@@ -370,7 +380,7 @@ class DecodeCodeObject:
                     arg = temp_arg
                     arg |= extended_arg
 
-                bytes_read  = 3
+                bytes_read = 3
             else:
                 # EXTENDED_ARG should be infront of any opcode with arg, if not
                 # there is a problem
@@ -385,8 +395,7 @@ class DecodeCodeObject:
     def _code_index_val(self, i):
         if isinstance(self.code[i], str):
             return ord(self.code[i])
-        else:
-            return self.code[i]
+        return self.code[i]
 
     def _unpack_wordcode(self):
         extended_arg = 0
@@ -476,7 +485,8 @@ def distb(tb=None, file=None):
             tb = sys.last_traceback
         except AttributeError:
             raise RuntimeError("no last traceback to disassemble")
-        while tb.tb_next: tb = tb.tb_next
+        while tb.tb_next:
+            tb = tb.tb_next
 
     # Lats traceback always would be the current version of python, hence no
     # need to worry about the python version.
@@ -484,7 +494,7 @@ def distb(tb=None, file=None):
 
 
 def disassemble_recursive(
-    code, lasti=-1, python_version=None, file=None, depth=None):
+        code, lasti=-1, python_version=None, file=None, depth=None):
     """Disassemble a code object recursively"""
     disassemble(code, lasti, python_version, file)
 
