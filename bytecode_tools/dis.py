@@ -520,3 +520,11 @@ def disassemble(code, lasti=-1, python_version=None, file=None):
         python_version=python_version,
         file=file
     ).disassemble()
+
+
+def instructions(code, python_version=None):
+    """Disassemble a code object."""
+    return DecodeCodeObject(
+        code,
+        python_version=python_version
+    ).unpack_code()
