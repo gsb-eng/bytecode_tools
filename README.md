@@ -11,17 +11,17 @@ bytecode.
 
 Right now it has `pydis`.
 
-PyDis
+What is pydis?
 =========
 
-Pydis is a python disassembler, it can be a replacement for cpython's 
+`pydis` is a python disassembler, it can be a drop in replacement for cpython's
 `Lib/dis.py`.
 
 Pydis supports all the cpython versions above 2.5, every verion above 2.5
 supports other versions. This means, pydis decodes 2.6 bytes code in 3.6 and
 vice versa.
 
-Why Pydis?
+Why pydis?
 ==========
 
 Python's `dis` moduel is super helpful for looking inside code objects, but it
