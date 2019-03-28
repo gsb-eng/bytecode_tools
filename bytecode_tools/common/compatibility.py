@@ -4,7 +4,7 @@
 
 import sys
 
-from bytecode_tools.constants import IS_PY2, IS_PY3
+from bytecode_tools.common.constants import IS_PY2, IS_PY3
 
 
 def native_str(s):

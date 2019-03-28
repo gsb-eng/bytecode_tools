@@ -13,8 +13,9 @@ This is more relavent to/used some portions of Cpython's Lib/dis.py
 import sys
 import types
 
-from bytecode_tools import opcodes
-from bytecode_tools.constants import PY_VERSION
+from bytecode_tools.common import opcodes
+from bytecode_tools.common.constants import PY_VERSION
+from bytecode_tools.common.decode_code_object import DecodeCodeObject
 
 
 # These are fixed as per Cpython's Lib/dis.py
@@ -24,7 +25,7 @@ _OPARG_WIDTH = 5
 _have_code = (types.MethodType, types.FunctionType, types.CodeType,
               classmethod, staticmethod, type)
 
-class DecodeCodeObject:
+class DecodeCodeObjectBack:
     """Decode code object"""
     def __init__(
             self,

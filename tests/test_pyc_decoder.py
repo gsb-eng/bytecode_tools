@@ -2,7 +2,7 @@
 import os
 import unittest
 
-from bytecode_tools.pyc_decoder import decode_pyc
+from bytecode_tools.pycdecode import pycdecode
 from bytecode_tools.unmarshal import CodeType
 
 
@@ -18,7 +18,7 @@ class TestPycDecoder(unittest.TestCase):
 
         self.assertTrue(os.path.exists(self.pyc36))
 
-        ret_val = decode_pyc(self.pyc36)
+        ret_val = pycdecode(self.pyc36)
 
         self.assertEqual(len(ret_val), 4)
         self.assertEqual(ret_val[0], 3379)
@@ -28,7 +28,7 @@ class TestPycDecoder(unittest.TestCase):
     def test_decode_pyc_37(self):
 
         self.assertTrue(os.path.exists(self.pyc37))
-        ret_val = decode_pyc(self.pyc37)
+        ret_val = pycdecode(self.pyc37)
         self.assertEqual(len(ret_val), 4)
         self.assertEqual(ret_val[0], 3394)
         self.assertEqual(ret_val[2], 89)

@@ -3,8 +3,8 @@ import os
 import sys
 import unittest
 
-from bytecode_tools.constants import IS_PY2
-from bytecode_tools import opcodes
+from bytecode_tools.common.constants import IS_PY2
+from bytecode_tools.common import opcodes
 
 
 

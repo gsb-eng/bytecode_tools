@@ -3,9 +3,9 @@ import os
 import sys
 import unittest
 
-from bytecode_tools import dis
-from bytecode_tools.constants import IS_PY2
-from bytecode_tools.pyc_decoder import decode_pyc
+from bytecode_tools import pydis as dis
+from bytecode_tools.common.constants import IS_PY2
+from bytecode_tools.pycdecode import pycdecode
 
 
 
@@ -18,7 +18,7 @@ class TestPycDecoder(unittest.TestCase):
         self.pyc37 = os.path.join(self.pyc_dir, 'test.cpython-37.pyc')
 
     def test_unpack(self):
-        _, _, _, code_object = decode_pyc(self.pyc37)
+        _, _, _, code_object = pycdecode(self.pyc37)
 
         instructions = dis.DecodeCodeObject(
             code_object,

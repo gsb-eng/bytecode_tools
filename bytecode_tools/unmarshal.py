@@ -8,8 +8,8 @@ import io
 import struct
 import types
 
-from bytecode_tools import compatibility as compat 
-from bytecode_tools.constants import (
+from bytecode_tools.common import compatibility as compat 
+from bytecode_tools.common.constants import (
     FLAG_REF as REF, IS_PY2, IS_PY3, MAGIC_NUMBERS, MARSHAL_CODES, PY_VERSION
 )
 

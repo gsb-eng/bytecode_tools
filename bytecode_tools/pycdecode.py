@@ -8,7 +8,7 @@ import mimetypes
 import os
 import struct
 
-from bytecode_tools.constants import (
+from bytecode_tools.common.constants import (
     IS_PY3, MAGIC_NUMBERS, PYC_MIME_TYPE, V3, V4
 )
 from bytecode_tools.unmarshal import load
@@ -96,7 +96,7 @@ def _decode_header(fp):
     return magic, ts, size
 
 
-def decode_pyc(file_or_bytes):
+def pycdecode(file_or_bytes):
     """Decoding the pyc files, this will accept a pyc file or a bytes array and
     even the io.BytesIo buffer.
 
