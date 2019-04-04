@@ -433,6 +433,4 @@ def loads(s, python_version=PY_VERSION):
     first will be evaluated and rest ignored.
     """
     assert isinstance(s, bytes), 'input string must be bytes'
-    # Take only the first byte, rest ignore
-    # s = io.BytesIO(s).read(1)
     return _Unmarshal()(s, python_version)
