@@ -220,7 +220,7 @@ class DecodeCodeObject:
         WHAT IF line number increment is > 127 or < -128 ?
 
         In the above example, we've an instance where the line incrementis more
-        than 255.
+        than 127.
 
           Byte:   Line
           ----    ----
