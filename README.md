@@ -16,8 +16,8 @@ Let's say `marshal` module, it's purpose is to `serialize` or `deserialize` code
 
 Our goal is to make `bytecode_tools` work with any `Cpython` version, Aim is to build below tools.
 
-|Tool|Purpose|
-|---|---|
+|Tool|Purpose|Status|
+|---|---|---|
 |unmarshal|deserialize the code obejcts.|Completed|
 |pydis|Disassembler for any Cpython version.|completed|
 |pycdecode|Decoder for bytecode chache files (`pyc` files)|Completed|
