@@ -58,7 +58,7 @@ Python's `dis` moduel is super helpful for looking inside code objects, but it
 won't support other python versions. If the code object is created through
 `python 3.5` and try to disassemble with `python3.6`, it won't work.
 
-Each python version gets changes to opcodes, there will be ne ones added and few
+Each python version gets changes to opcodes, there will be new ones added and few
 are deleted. Unless you recreate the code object with new python version, the
 same code object can't be interpreted with old versions.
 
