@@ -14,7 +14,7 @@ from bytecode_tools.common.constants import (
 )
 
 # TODO: Add more version compatibilities.
-# Python2 intrepreter should be supported.
+# Python2 interpreter should be supported.
 class _NULL:
     pass
 
@@ -61,7 +61,7 @@ class CodeType:
 class _Unmarshal:
 
     def __call__(self, fp_or_bytes, python_version=None):
-        # File pointer opned in binary mode.
+        # File pointer opened in binary mode.
         # One should make sure, if the pyc file is passed the first 8/12 bytes
         # should be read before reaching here. otherwise a bad marshal exception
         # occurs.

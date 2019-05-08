@@ -12,6 +12,7 @@ from bytecode_tools.common.constants import (
     IS_PY3, MAGIC_NUMBERS, PYC_MIME_TYPE, V3, V4
 )
 from bytecode_tools.unmarshal import load
+from bytecode_tools.pydis import dis
 
 
 class UnknowMagic(Exception):
@@ -125,3 +126,14 @@ def pycdecode(file_or_bytes):
     fp.close()
 
     return magic, ts, size, code_object
+
+
+def showpyc(file_or_bytes):
+    """Function to decode pyc file and show the content of it.
+    """
+    magic, ts, size, code_object = pycdecode(file_or_bytes)
+    print("Magic     : ", repr(magic))
+    print("timestamp : ", ts)
+    print("Size      : ", repr(size))
+    # Disassemble the code object.
+    dis(code_object)
