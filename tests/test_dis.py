@@ -1,12 +1,9 @@
 
 import os
-import sys
 import unittest
 
 from bytecode_tools import pydis as dis
-from bytecode_tools.common.constants import IS_PY2
 from bytecode_tools.pycdecode import pycdecode
-
 
 
 class TestPycDecoder(unittest.TestCase):
@@ -28,6 +25,13 @@ class TestPycDecoder(unittest.TestCase):
         ).unpack_code()
 
         self.assertEqual(len(instructions), 17)
+
+    def test_show_code(self):
+        _, _, _, code_object = pycdecode(self.pyc37)
+
+        formatted_code = dis.code_info(code_object)
+
+        self.assertIsInstance(formatted_code, str)
 
 
 if __name__ == '__main__':
