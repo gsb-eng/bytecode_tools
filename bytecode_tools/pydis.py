@@ -13,8 +13,6 @@ This is more relavent to/used some portions of Cpython's Lib/dis.py
 import sys
 import types
 
-from bytecode_tools.common import opcodes
-from bytecode_tools.common.constants import PY_VERSION
 from bytecode_tools.common.decode_code_object import DecodeCodeObject
 
 
@@ -89,6 +87,88 @@ def _disassemble_str(source, **kwargs):
     """Compile the source string, then disassemble the code object."""
     disassemble_recursive(_try_compile(source, '<dis>'), **kwargs)
 
+def _get_code_object(x):
+    """Helper to handle methods, compiled or raw code objects, and strings."""
+    # Extract functions from methods.
+    if hasattr(x, '__func__'):
+        x = x.__func__
+    # Extract compiled code objects from...
+    if hasattr(x, '__code__'):  # ...a function, or
+        x = x.__code__
+    elif hasattr(x, 'gi_code'):  #...a generator object, or
+        x = x.gi_code
+    elif hasattr(x, 'ag_code'):  #...an asynchronous generator object, or
+        x = x.ag_code
+    elif hasattr(x, 'cr_code'):  #...a coroutine.
+        x = x.cr_code
+    # Handle source code.
+    if isinstance(x, str):
+        x = _try_compile(x, "<disassembly>")
+    # By now, if we don't have a code object, we can't disassemble x.
+    if hasattr(x, 'co_code'):
+        return x
+    raise TypeError("don't know how to disassemble %s objects" %
+                    type(x).__name__)
+
+COMPILER_FLAG_NAMES = {
+    1: "OPTIMIZED",
+    2: "NEWLOCALS",
+    4: "VARARGS",
+    8: "VARKEYWORDS",
+    16: "NESTED",
+    32: "GENERATOR",
+    64: "NOFREE",
+    128: "COROUTINE",
+    256: "ITERABLE_COROUTINE",
+    512: "ASYNC_GENERATOR",
+}
+
+def pretty_flags(flags):
+    """Return pretty representation of code flags."""
+    names = []
+    for i in range(32):
+        flag = 1<<i
+        if flags & flag:
+            names.append(COMPILER_FLAG_NAMES.get(flag, hex(flag)))
+            flags ^= flag
+            if not flags:
+                break
+    else:
+        names.append(hex(flags))
+    return ", ".join(names)
+
+
+def _format_code_info(co):
+    lines = []
+    lines.append("Name:              %s" % co.co_name)
+    lines.append("Filename:          %s" % co.co_filename)
+    lines.append("Argument count:    %s" % co.co_argcount)
+    lines.append("Kw-only arguments: %s" % co.co_kwonlyargcount)
+    lines.append("Number of locals:  %s" % co.co_nlocals)
+    lines.append("Stack size:        %s" % co.co_stacksize)
+    lines.append("Flags:             %s" % pretty_flags(co.co_flags))
+    if co.co_consts:
+        lines.append("Constants:")
+        for i_c in enumerate(co.co_consts):
+            lines.append("%4d: %r" % i_c)
+    if co.co_names:
+        lines.append("Names:")
+        for i_n in enumerate(co.co_names):
+            lines.append("%4d: %s" % i_n)
+    if co.co_varnames:
+        lines.append("Variable names:")
+        for i_n in enumerate(co.co_varnames):
+            lines.append("%4d: %s" % i_n)
+    if co.co_freevars:
+        lines.append("Free variables:")
+        for i_n in enumerate(co.co_freevars):
+            lines.append("%4d: %s" % i_n)
+    if co.co_cellvars:
+        lines.append("Cell variables:")
+        for i_n in enumerate(co.co_cellvars):
+            lines.append("%4d: %s" % i_n)
+    return "\n".join(lines)
+
 
 def distb(tb=None, file=None):
     """Disassemble a traceback (default: last traceback).
@@ -143,3 +223,8 @@ def instructions(code, python_version=None):
         code,
         python_version=python_version
     ).unpack_code()
+
+
+def code_info(code):
+    """Code object info"""
+    return _format_code_info(_get_code_object(code))
