@@ -127,7 +127,8 @@ If you do `python -m test.py`, based on the versioon that you use. You'll get a 
 
 I'm using python37 here, I've got the cache file under `__pycahce__`
 
-    >>> showpyc('<path_till_here>/__pycache__/test_pycdecoder.cpython-37.pyc')
+    >>> from bytecode_tools import pycdecode
+    >>> pycdecode.showpyc('<path_till_here>/__pycache__/test_pycdecoder.cpython-37.pyc')
 
     Magic     :  3394
     timestamp :  2019-05-23 02:28:58
