@@ -14,6 +14,7 @@ import sys
 import types
 
 from bytecode_tools.common.decode_code_object import DecodeCodeObject
+from bytecode_tools.unmarshal import CodeType
 
 
 # These are fixed as per Cpython's Lib/dis.py
@@ -63,7 +64,9 @@ def dis(x=None, file=None, depth=None):
     elif hasattr(x, 'cr_code'):  #...a coroutine.
         x = x.cr_code
     # Perform the disassembly.
-    if hasattr(x, '__dict__'):  # Class or module
+    if isinstance(x, CodeType):
+        disassemble_recursive(x, file=file, depth=depth)
+    elif hasattr(x, '__dict__'):  # Class or module
         items = sorted(x.__dict__.items())
         for name, x1 in items:
             if isinstance(x1, _have_code):
@@ -207,20 +210,20 @@ def disassemble_recursive(
                 )
 
 
-def disassemble(code, lasti=-1, python_version=None, file=None):
+def disassemble(code_object, lasti=-1, python_version=None, file=None):
     """Disassemble a code object."""
     DecodeCodeObject(
-        code,
+        code_object,
         last_instruction=lasti,
         python_version=python_version,
         file=file
     ).disassemble()
 
 
-def instructions(code, python_version=None):
+def instructions(code_object, python_version=None):
     """Disassemble a code object."""
     return DecodeCodeObject(
-        code,
+        code_object,
         python_version=python_version
     ).unpack_code()
 

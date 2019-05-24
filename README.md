@@ -41,9 +41,6 @@ Usage
 pydis
 =====
 
-What is pydis?
-=========
-
 `pydis` is a python disassembler, it can be a drop in replacement for cpython's
 `Lib/dis.py`.
 
@@ -100,3 +97,23 @@ Disassble a function object.
 
       6          24 LOAD_FAST                2 (c)
                  26 RETURN_VALUE
+
+
+To get the all the bytecode instructions.
+
+    >>> pydis.instructions(foo.__code__)
+    [LOAD_GLOBAL, LOAD_CONST, CALL_FUNCTION, POP_TOP, LOAD_CONST, STORE_FAST, LOAD_CONST, STORE_FAST, LOAD_FAST, LOAD_FAST, BINARY_ADD, STORE_FAST, LOAD_FAST, RETURN_VALUE]
+
+Like wise other `dis` module options are available with `pydis`.
+
+pyc decoder?
+====================
+
+what are `pyc` files?
+=====================
+
+`pyc` files are python bytecode cache files, they will be used in `eval` loop at the `interpretation` stage. `Compilation` phase output gets serialized into `pyc` file along with some meta data to identify the python version and the time it was created. `pyc` files are heavily version specific, this means `pyc` file generated from one version of python won't be `intrepreted` with other version.
+
+The meta data which has been serialized into to `pyc` files are identifiers for invalidating the `pyc` file incase if the source file is newer or the interpreter version has changed. This is mailny because of the incompatibility of the bytecode across versions. New `opcodes` will be added or deleted from version to version.
+
+Bytecode tools `pycdecoder` helps with deserializing bytecode object and parse the metadata with any version of `cpython`.
