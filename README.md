@@ -107,7 +107,7 @@ To get the all the bytecode instructions.
 Like wise other `dis` module options are available with `pydis`.
 
 pyc decoder?
-====================
+============
 
 what are `pyc` files?
 =====================
@@ -117,3 +117,28 @@ what are `pyc` files?
 The meta data which has been serialized into to `pyc` files are identifiers for invalidating the `pyc` file incase if the source file is newer or the interpreter version has changed. This is mailny because of the incompatibility of the bytecode across versions. New `opcodes` will be added or deleted from version to version.
 
 Bytecode tools `pycdecoder` helps with deserializing bytecode object and parse the metadata with any version of `cpython`.
+
+Let's say you've a python file `test.py` with the below statements.
+
+    a = 1
+    print(a)
+
+If you do `python -m test.py`, based on the versioon that you use. You'll get a `test.pyc` ot `__pycahce__/test_cpython-37.pyc` (From pyhton3 pyc files are cached in `__pycahce__` dir).
+
+I'm using python37 here, I've got the cache file under `__pycahce__`
+
+    >>> showpyc('<path_till_here>/__pycache__/test_pycdecoder.cpython-37.pyc')
+
+    Magic     :  3394
+    timestamp :  2019-05-23 02:28:58
+    Size      :  15
+    Bytecode  :
+      1           0 LOAD_CONST               0 (1)
+                  2 STORE_NAME               0 (a)
+
+      2           4 LOAD_NAME                1 (print)
+                  6 LOAD_NAME                0 (a)
+                  8 CALL_FUNCTION            1
+                 10 POP_TOP
+                 12 LOAD_CONST               1 (None)
+                 14 RETURN_VALUE
