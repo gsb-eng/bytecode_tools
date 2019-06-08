@@ -123,7 +123,7 @@ Let's say you've a python file `test.py` with the below statements.
     a = 1
     print(a)
 
-If you do `python -m test.py`, based on the versioon that you use. You'll get a `test.pyc` ot `__pycahce__/test_cpython-37.pyc` (From pyhton3 pyc files are cached in `__pycahce__` dir).
+If you do `python -m test.py`, based on the versioon that you use. You'll get a `test.pyc` or `__pycahce__/test_cpython-37.pyc` (From pyhton3 pyc files are cached in `__pycahce__` dir).
 
 I'm using python37 here, I've got the cache file under `__pycahce__`
 
@@ -143,3 +143,4 @@ I'm using python37 here, I've got the cache file under `__pycahce__`
                  10 POP_TOP
                  12 LOAD_CONST               1 (None)
                  14 RETURN_VALUE
+
